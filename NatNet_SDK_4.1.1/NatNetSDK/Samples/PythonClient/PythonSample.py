@@ -23,6 +23,7 @@ import time
 from NatNetClient import NatNetClient
 import DataDescriptions
 import MoCapData
+import numpy as np
 
 # This is a callback function that gets connected to the NatNet client
 # and called once per mocap frame.
@@ -168,8 +169,18 @@ def receive_new_pos(rigid_body_list):
         print(f"id: {rigid_body.id_num}")
         print(f"pos: {rigid_body.pos[0]}, {rigid_body.pos[1]}, {rigid_body.pos[2]}")
 
-def process_marker_pos(marker_id, marker_pos):
-    print(f"Process: Marker ID: {marker_id}, Pos: {marker_pos}")
+def process_marker_pos(rigid_body_list):
+    if len(rigid_body_list) != 2:
+        return
+    else: 
+        body0 = rigid_body_list[0]
+        body1 = rigid_body_list[1]
+
+        ray_origin = np.array([body0.pos[0]])
+def ray_plane_intersection(ray_origin, ray_direction, plane_point, plan_normal):
+    pass
+
+
 
 if __name__ == "__main__":
 
