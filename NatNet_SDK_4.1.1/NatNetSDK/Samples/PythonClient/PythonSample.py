@@ -163,7 +163,6 @@ def my_parse_args(arg_list, args_dict):
     return args_dict
 
 def receive_new_pos(rigid_body_list):
-    #pass
     print(f"found rigid_body count: {len(rigid_body_list)}")
     for rigid_body in rigid_body_list:
         print(f"id: {rigid_body.id_num}")
@@ -176,10 +175,38 @@ def process_marker_pos(rigid_body_list):
         body0 = rigid_body_list[0]
         body1 = rigid_body_list[1]
 
-        ray_origin = np.array([body0.pos[0]])
-def ray_plane_intersection(ray_origin, ray_direction, plane_point, plan_normal):
-    pass
+        ray_start = np.array([body0.pos[0],body0.pos[1],body0.pos[2]])
+        ray_end = np.array([body1.pos[0],body1.pos[1],body1.pos[2]])
+        plane_point = np.array([0, 2.7, 0])
+        plane_normal = np.array([0, 1, 0])
 
+        intersection_point = receive_rigid_body_frame(
+            ray_start, ray_end, plane_point, plane_normal
+            )
+        
+def ray_plane_intersection(ray_start, ray_end, plane_point, plane_normal):
+    #normalize
+    ray_direction = ray_end - ray_start
+    ray_direction = ray_direction / np.linalg.norm(ray_direction)
+    plane_normal = plane_normal / np.linalg.norm(plane_normal)
+
+    # calculate dot product 
+    dot_product = np.dot(ray_direction, plane_normal)
+    if np.isclose(dot_product, 0):
+        return None
+    
+    # caldulate parameter t
+    t = np.dot(plane_point - ray_start, plane_normal) / dot_product
+    if t < 0:
+        return None
+    
+    #calculate thte intersection point
+    intersection_point = ray_start + ray_direction
+    
+    return intersection_point
+
+def ray_dome_intersection():
+    pass
 
 
 if __name__ == "__main__":
