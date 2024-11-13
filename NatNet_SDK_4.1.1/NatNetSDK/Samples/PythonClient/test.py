@@ -29,4 +29,12 @@ if __name__ == "__main__":
     ray_end = np.array([0, 0, 1])
     plane_point = np.array([0, 0, 5])
     plane_normal = np.array([0, 0, 1])
+
+    pt = ray_plane_intersection(
+        ray_start, ray_end, plane_point, plane_normal
+        )
+
+    print(pt)
+
+
     
