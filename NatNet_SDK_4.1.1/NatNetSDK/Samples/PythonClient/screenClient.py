@@ -2,6 +2,7 @@ import socket
 import struct
 import pygame
 import time
+import sys
 
 def draw():
     pygame.init()
@@ -32,14 +33,30 @@ if __name__ == "__main__":
     is_looping = True
     time.sleep(1)
 
+    pygame.init()
+
+    window_size = (800, 500)
+    screen = pygame.display.set_mode(window_size)
+    pygame.display.set_caption("draw a 2d point")
+
+    x, y = 200, 200
+
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
+        screen.fill((0, 0, 0))
 
+        point_color = (0, 0, 255)
+        point_radius = 5
 
+        pygame.draw.circle(screen, point_color, (x, y), point_radius)
+        pygame.disply.flip()
+
+    pygame.quit()
+    sys.exit()
 
     # while True:
     #     data, addr = sock.recvfrom(8)
