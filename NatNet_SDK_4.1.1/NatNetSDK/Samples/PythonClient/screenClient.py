@@ -21,17 +21,24 @@ def draw(values):
     pygame.display.flip()
 
 def receive():
+    global user_input
     data, addr = sock.recvfrom(8)
     values = struct.unpack("!ff", data)
     print(f"Received message: {values} from {addr}")
+
+    if user_input:
+        return
 
     draw(values)
 
 def listen_for_input():
     global user_input
     user_input = None
+
     while True:
         user_input = input('Enter any key to quit')
+        if user_input == "q":
+            print("quit")
 
 def main_loop():
     global user_input
@@ -43,19 +50,14 @@ def main_loop():
     running = True
     while running:
         if user_input:
-            print(user_input)
-            # user_input = None
-
-            # quit
             sock.shutdown()
             pygame.quit()
             sys.exit()
             break
-
         else:
             # receive motive 
             receive()
-
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -75,6 +77,6 @@ if __name__ == "__main__":
     window_size = (1280, 800)
     screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption("draw a 2d point")
-
+    
     main_loop()
 
