@@ -5,8 +5,13 @@ import time
 import sys
 import threading
 
-def draw():
-    x, y = 200, 200
+def draw(values):
+    if values == None:
+        x, y = 0, 0
+    else:
+        x = values[0] * 100
+        y = values[1] * 100
+
     screen.fill((0, 0, 0))
 
     point_color = (0, 0, 255)
@@ -19,6 +24,8 @@ def receive():
     data, addr = sock.recvfrom(8)
     values = struct.unpack("!ff", data)
     print(f"Received message: {values} from {addr}")
+
+    draw(values)
 
 def listen_for_input():
     global user_input
@@ -36,7 +43,8 @@ def main_loop():
     running = True
     while running:
         if user_input:
-            user_input = None
+            print(user_input)
+            # user_input = None
 
             # quit
             sock.shutdown()
@@ -47,7 +55,6 @@ def main_loop():
         else:
             # receive motive 
             receive()
-            draw()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -65,7 +72,7 @@ if __name__ == "__main__":
 
     # init draw
     pygame.init()
-    window_size = (800, 500)
+    window_size = (1280, 800)
     screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption("draw a 2d point")
 
