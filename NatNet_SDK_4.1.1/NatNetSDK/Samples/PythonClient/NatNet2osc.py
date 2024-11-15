@@ -94,10 +94,11 @@ def receive_new_pos(rigid_body_list):
     if(len(rigid_body_list) != 2):
         return 
 
+    # test_receiving_pos(rigid_body_list)
     pt_screen, pt_dome = tracked_pos_2_projected_points(rigid_body_list[0], rigid_body_list[1])
-    # print(pt_screen)
     
-    # send_2_holophonix(pt_dome)
+    send_2_holophonix(pt_dome)
+    print(pt_dome)
     send_2_screen(pt_screen)
 
 def test_receiving_pos(rigid_body_list):
@@ -117,6 +118,10 @@ def tracked_pos_2_projected_points(rigid_body_0, rigid_body_1):
     plane_point = np.array([0, 0, 2.7])
     plane_normal = np.array([0, 0, 1])
 
+    # ray_origin = np.array([0, 0, 0])
+    # ray_end = np.array([1, 1, 1])
+    # ray_direction = ray_end - ray_origin
+    
     pt_screen = ray_plane_intersection(
         ray_origin, ray_direction, plane_point, plane_normal
     )
@@ -146,6 +151,8 @@ def send_2_screen(pt_screen):
     # screen_client.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
 
 def send_2_holophonix(pt_dome):
+    if(pt_dome is None):
+        return 
     holophonix_client.send_message("/track/1/xyz", tuple([pt_dome[0], pt_dome[1], pt_dome[2]]))
 
 if __name__ == "__main__":
