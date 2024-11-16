@@ -1,6 +1,6 @@
 from NatNetClient import NatNetClient
 import numpy as np
-from pythonosc import udp_client
+# from pythonosc import udp_client
 import socket
 import struct
 
@@ -95,11 +95,10 @@ def receive_new_pos(rigid_body_list):
         return 
 
     # test_receiving_pos(rigid_body_list)
-    pt_screen, pt_dome = tracked_pos_2_projected_points(rigid_body_list[0], rigid_body_list[1])
+    pt_screen, pt_dome, dist = process_tracked_poses(rigid_body_list[0], rigid_body_list[1])
     
     send_2_holophonix(pt_dome)
-    print(pt_dome)
-    send_2_screen(pt_screen)
+    send_2_screen(pt_screen, dist)
 
 def test_receiving_pos(rigid_body_list):
     print(f"found rigid_body count: {len(rigid_body_list)}")
@@ -107,16 +106,17 @@ def test_receiving_pos(rigid_body_list):
        print(f"id: {rigid_body.id_num}")
        print(f"pos: {rigid_body.pos[0]}, {rigid_body.pos[1]}, {rigid_body.pos[2]}")
 
-def tracked_pos_2_projected_points(rigid_body_0, rigid_body_1):
+def process_tracked_poses(rigid_body_0, rigid_body_1):
     # create ray from trakced 2 poses
     ray_origin = np.array([rigid_body_0.pos[0], rigid_body_0.pos[1], rigid_body_0.pos[2]])
     ray_end = np.array([rigid_body_1.pos[0], rigid_body_1.pos[1], rigid_body_1.pos[2]])
     ray_direction = ray_end - ray_origin
+    distance = np.linalg.norm(ray_end - ray_origin)
 
     # intersect with screen
     # fixed plane
-    plane_point = np.array([0, 0, 2.7])
-    plane_normal = np.array([0, 0, 1])
+    plane_point = np.array([0, 0, -2.7])
+    plane_normal = np.array([0, 0, -1])
 
     # ray_origin = np.array([0, 0, 0])
     # ray_end = np.array([1, 1, 1])
@@ -136,16 +136,16 @@ def tracked_pos_2_projected_points(rigid_body_0, rigid_body_1):
         ray_origin, ray_direction, dome_center, dome_radius, dome_up_direction
         )
     
-    return pt_screen, pt_dome
+    return pt_screen, pt_dome, distance
 
-def send_2_screen(pt_screen):
-    if(pt_screen is None):
+def send_2_screen(pt_screen, dist):
+    if(pt_screen is None) or (dist is None):
         return 
     
     w = pt_screen[0]
     h = pt_screen[1]
 
-    packed_data = struct.pack("!ff", w, h)
+    packed_data = struct.pack("!fff", w, h, dist)
     screen_client.sendto(packed_data, (UDP_IP, UDP_PORT))
     # MESSAGE = "hello!"
     # screen_client.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
@@ -157,7 +157,7 @@ def send_2_holophonix(pt_dome):
 
 if __name__ == "__main__":
     # holophonix client
-    holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
+    # holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
 
     # screen projection client
     UDP_IP = "127.0.0.1"
@@ -171,5 +171,16 @@ if __name__ == "__main__":
     streaming_client.pos_listener = receive_new_pos
     streaming_client.set_print_level(30)
     streaming_client.run()
+
+    # quiting mechanism
+    running = True
+    while running:
+        user_input = input("enter q to quit")
+        if user_input == "q":
+            running = False
+            streaming_client.shutdown()
+            break
+
+
 
 
