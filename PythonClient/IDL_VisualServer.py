@@ -45,7 +45,7 @@ def on_click(x, y, button, pressed):
 def receive():
     while True:
         data, addr = sock.recvfrom(12)
-        values = struct.unpack("!ff", data)
+        values = struct.unpack("!fff", data)
         print(f"Received message: {values} from {addr}")
 
         # display result
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     pygame.display.set_caption("draw a 2d point")
     
     # set up listener to for mouse click
-    listener =  Listener(on_click=on_click)
+    listener = Listener(on_click=on_click)
     listener.start()
 
     # main thread
