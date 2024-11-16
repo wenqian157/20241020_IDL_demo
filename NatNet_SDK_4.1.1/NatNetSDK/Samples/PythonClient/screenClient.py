@@ -4,64 +4,53 @@ import pygame
 import time
 import sys
 import threading
+from pynput.mouse import Listener
 
-def draw(values):
+
+def update_draw(values):
     if values == None:
         x, y = 0, 0
+        dist = 10
     else:
         x = values[0] * 100
         y = values[1] * 100
+        dist = values[2] * 100
 
     screen.fill((0, 0, 0))
 
     point_color = (0, 0, 255)
-    point_radius = 5
+    point_radius = dist
 
     pygame.draw.circle(screen, point_color, (x, y), point_radius)
     pygame.display.flip()
 
+def update_ai_draw(values):
+    # here to update the box location and size based on values
+    # succesful values is a list of 3 float: point.x, point.y, dist 
+    pass
+
+def update_ai_generate():
+    # here take mouse input to update ai generating
+    # see function on_click
+    pass
+
+def on_click(x, y, button, pressed):
+    if pressed:
+        if button.name == "left":
+            print("left")
+            update_ai_generate()
+        elif button.name == "right":
+            print("right")
+
 def receive():
-    global user_input
-    data, addr = sock.recvfrom(8)
-    values = struct.unpack("!ff", data)
-    print(f"Received message: {values} from {addr}")
-
-    if user_input:
-        return
-
-    draw(values)
-
-def listen_for_input():
-    global user_input
-    user_input = None
-
     while True:
-        user_input = input('Enter any key to quit')
-        if user_input == "q":
-            print("quit")
+        data, addr = sock.recvfrom(12)
+        values = struct.unpack("!ff", data)
+        print(f"Received message: {values} from {addr}")
 
-def main_loop():
-    global user_input
-
-    input_thread = threading.Thread(target=listen_for_input)
-    input_thread.daemon = True
-    input_thread.start()
-
-    running = True
-    while running:
-        if user_input:
-            sock.shutdown()
-            pygame.quit()
-            sys.exit()
-            break
-        else:
-            # receive motive 
-            receive()
-            
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
+        # display result
+        update_draw(values)
+    
 
 if __name__ == "__main__":
     
@@ -72,11 +61,35 @@ if __name__ == "__main__":
     sock.bind((UDP_IP, UDP_PORT))
     print(f"Listening on {UDP_IP}: {UDP_PORT}...")
 
-    # init draw
+    receice_thread = threading.Thread(target=receive)
+    receice_thread.daemon = True
+    time.sleep(1)
+    receice_thread.start()
+
+    # init pygame draw
     pygame.init()
     window_size = (1280, 800)
     screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption("draw a 2d point")
     
-    main_loop()
+    # set up listener to for mouse click
+    listener =  Listener(on_click=on_click)
+    listener.start()
+
+    # main thread
+    running = True
+    while running:
+        print("running")
+        user_input = input('Enter q to quit')
+        if user_input == "q":
+            sock.close()
+            receice_thread.join()
+            pygame.quit()
+            sys.exit()
+            listener.stop()
+            running = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
