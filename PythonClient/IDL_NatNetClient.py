@@ -1,6 +1,6 @@
 from NatNetClient import NatNetClient
 import numpy as np
-# from pythonosc import udp_client
+from pythonosc import udp_client
 import socket
 import struct
 
@@ -20,7 +20,7 @@ def screen_boundary(w, h):
 def project_pt_2_screen(point_3d):
     w = point_3d[0]
     h = point_3d[1]
-    w, h = screen_boundary(w, h)
+    # w, h = screen_boundary(w, h)
     return [w, h]
 
 def ray_plane_intersection(ray_origin, ray_direction, plane_point, plane_normal):
@@ -90,15 +90,16 @@ def ray_dome_intersection(ray_origin, ray_direction, dome_center, dome_radius, d
         return None  # Intersection is in the opposite hemisphere
 
 def receive_new_pos(rigid_body_list):
-    print(f"found rigid_body count: {len(rigid_body_list)}")
+    # print(f"found rigid_body count: {len(rigid_body_list)}")
     if(len(rigid_body_list) != 2):
         return 
+    test_receiving_pos(rigid_body_list)
 
     # test_receiving_pos(rigid_body_list)
     pt_screen, pt_dome, dist = process_tracked_poses(rigid_body_list[0], rigid_body_list[1])
     
     send_2_holophonix(pt_dome)
-    send_2_screen(pt_screen, dist)
+    # send_2_screen(pt_screen, dist)
 
 def test_receiving_pos(rigid_body_list):
     print(f"found rigid_body count: {len(rigid_body_list)}")
@@ -115,8 +116,8 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
 
     # intersect with screen
     # fixed plane
-    plane_point = np.array([0, 0, -2.7])
-    plane_normal = np.array([0, 0, -1])
+    plane_point = np.array([0, 0, 2.7])
+    plane_normal = np.array([0, 0, 1])
 
     # ray_origin = np.array([0, 0, 0])
     # ray_end = np.array([1, 1, 1])
@@ -157,7 +158,7 @@ def send_2_holophonix(pt_dome):
 
 if __name__ == "__main__":
     # holophonix client
-    # holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
+    holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
 
     # screen projection client
     UDP_IP = "127.0.0.1"
