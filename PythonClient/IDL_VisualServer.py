@@ -61,16 +61,16 @@ if __name__ == "__main__":
     sock.bind((UDP_IP, UDP_PORT))
     print(f"Listening on {UDP_IP}: {UDP_PORT}...")
 
-    receice_thread = threading.Thread(target=receive)
-    receice_thread.daemon = True
-    time.sleep(1)
-    receice_thread.start()
-
     # init pygame draw
     pygame.init()
     window_size = (1280, 800)
     screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption("draw a 2d point")
+
+    receice_thread = threading.Thread(target=receive)
+    receice_thread.daemon = True
+    time.sleep(1)
+    receice_thread.start()
     
     # set up listener to for mouse click
     listener = Listener(on_click=on_click)
