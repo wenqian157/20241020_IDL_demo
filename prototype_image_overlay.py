@@ -1,8 +1,9 @@
 import pygame
-from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *  # Import GLUT
+from pygame.locals import *
+
 
 def load_texture(image_path):
     """Load an image and convert it to a texture."""
@@ -19,43 +20,68 @@ def load_texture(image_path):
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
     glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, image_data
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA,
+        width,
+        height,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        image_data,
     )
 
     return texture_id, width, height
 
 
 def draw_overlay(texture_id, display_size, opacity=0.5):
-    """Draw the overlay image with blending."""
-    width, height = display_size
+    """Draw the overlay image with blending, maintaining aspect ratio."""
+    display_width, display_height = display_size
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture_id)
 
     glDisable(GL_LIGHTING)  # Disable lighting before drawing the overlay
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    
-    # Set transparency to 50%
+
+    # Set transparency
     glColor4f(1, 1, 1, opacity)
 
     # Save the current projection matrix
     glMatrixMode(GL_PROJECTION)
     glPushMatrix()
     glLoadIdentity()
-    glOrtho(0, width, 0, height, -1, 1)
+    glOrtho(0, display_width, 0, display_height, -1, 1)
 
     # Save the current modelview matrix
     glMatrixMode(GL_MODELVIEW)
     glPushMatrix()
     glLoadIdentity()
 
-    # Draw the overlay quad
+    # Calculate aspect ratio to maintain proportions
+    overlay_aspect_ratio = tex_width / tex_height
+    display_aspect_ratio = display_width / display_height
+
+    if display_aspect_ratio > overlay_aspect_ratio:
+        new_height = display_height
+        new_width = new_height * overlay_aspect_ratio
+    else:
+        new_width = display_width
+        new_height = new_width / overlay_aspect_ratio
+
+    x_offset = (display_width - new_width) / 2
+    y_offset = (display_height - new_height) / 2
+
+    # Draw the overlay quad with adjusted dimensions
     glBegin(GL_QUADS)
-    glTexCoord2f(0, 0); glVertex2f(0, 0)
-    glTexCoord2f(1, 0); glVertex2f(width, 0)
-    glTexCoord2f(1, 1); glVertex2f(width, height)
-    glTexCoord2f(0, 1); glVertex2f(0, height)
+    glTexCoord2f(0, 0)
+    glVertex2f(x_offset, y_offset)
+    glTexCoord2f(1, 0)
+    glVertex2f(x_offset + new_width, y_offset)
+    glTexCoord2f(1, 1)
+    glVertex2f(x_offset + new_width, y_offset + new_height)
+    glTexCoord2f(0, 1)
+    glVertex2f(x_offset, y_offset + new_height)
     glEnd()
 
     # Restore the original projection and modelview matrices
@@ -69,60 +95,98 @@ def draw_overlay(texture_id, display_size, opacity=0.5):
     glEnable(GL_LIGHTING)  # Re-enable lighting
 
 
-def draw_scene():
+# def draw_scene(pos_x, pos_y, distance):
+#     # Clear the screen and depth buffer
+#     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+#     glEnable(GL_DEPTH_TEST)
+
+#     # Set material properties
+#     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.8, 0.5, 0.2, 1))  # Cube color
+#     glMaterialfv(GL_FRONT, GL_SPECULAR, (1.0, 1.0, 1.0, 1))  # Specular color
+#     glMaterialf(GL_FRONT, GL_SHININESS, 50)  # Shininess factor
+
+#     glutSolidCube(2)
+
+def draw_scene(pos_x, pos_y, distance):
     # Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
 
     # Set material properties
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.8, 0.5, 0.2, 1))  # Cube color
-    glMaterialfv(GL_FRONT, GL_SPECULAR, (1.0, 1.0, 1.0, 1))             # Specular color
-    glMaterialf(GL_FRONT, GL_SHININESS, 50)                             # Shininess factor
+    glMaterialfv(GL_FRONT, GL_SPECULAR, (1.0, 1.0, 1.0, 1))  # Specular color
+    glMaterialf(GL_FRONT, GL_SHININESS, 50)  # Shininess factor
 
-    glutSolidCube(2)
+    # Draw the first box (40 tall, 21 wide, 21 deep), centered at (pos_x, 20, 0)
+    glPushMatrix()
+    glTranslatef(pos_x, 20, 0)  # Translate to the desired position
+    glScalef(21, 40, 21)  # Scale to the desired dimensions
+    glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+    glPopMatrix()
 
-def save_screenshot(display, filename='cube_screenshot.png'):
+    # Draw the second box (distance wide, 4 tall, 23 deep), centered at (pos_x, pos_y, 0)
+    glPushMatrix()
+    glTranslatef(pos_x, pos_y, 0)  # Translate to the desired position
+    glScalef(distance, 4, 23)  # Scale to the desired dimensions
+    glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+    glPopMatrix()
+
+
+def save_screenshot(display, filename="cube_screenshot.png"):
     """Save a screenshot of the current OpenGL buffer."""
     width, height = display
     # Read the pixels from the frame buffer
     glPixelStorei(GL_PACK_ALIGNMENT, 1)
     data = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
     # Create a Pygame surface from the pixel data
-    image = pygame.image.fromstring(data, (width, height), 'RGBA', True)
+    image = pygame.image.fromstring(data, (width, height), "RGBA", True)
     # Flip the image vertically to correct orientation
     image = pygame.transform.flip(image, False, True)
     # Save the image as a PNG file
     pygame.image.save(image, filename)
     print(f"Screenshot saved as {filename}")
 
+
 def main():
     # Initialize Pygame and create an OpenGL-compatible window
     pygame.init()
-    display = (1280, 800)
-    pygame.display.set_caption('GenAI_render')
-    screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL | FULLSCREEN)
+    window_scale = 0.5
+    set_fullscreen = False
+    screen_width, screen_height = 2560, 1600
+    display = (int(screen_width * window_scale), int(screen_height * window_scale))
+    pygame.display.set_caption("GenAI_render")
+    if set_fullscreen:
+        screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL | FULLSCREEN)
+    else:
+        screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
     # Initialize GLUT
     glutInit([])
 
     # Set up perspective projection
     glMatrixMode(GL_PROJECTION)
-    gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
+    gluPerspective(45, (display[0] / display[1]), 0.1, 150.0)
     glMatrixMode(GL_MODELVIEW)
-    glTranslatef(0.0, 0.0, -5)
+    # Set the viewpoint explicitly
+    gluLookAt(0.0, 20.0, -100.0,  # Move camera 10 units along z-axis
+          0.0, 20.0, 0.0,   # Look at the origin
+          0.0, 1.0, 0.0)   # Up direction along y-axis
+
+    # glTranslatef(0.0, 0.0, -5)
 
     # Enable lighting
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
 
     # Set up light parameters
-    glLightfv(GL_LIGHT0, GL_POSITION,  (5, 5, 5, 1))  # Light position
-    glLightfv(GL_LIGHT0, GL_AMBIENT,   (0.2, 0.2, 0.2, 1))  # Ambient light
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,   (0.5, 0.5, 0.5, 1))  # Diffuse light
-    glLightfv(GL_LIGHT0, GL_SPECULAR,  (1.0, 1.0, 1.0, 1))  # Specular light
+    glLightfv(GL_LIGHT0, GL_POSITION, (5, 5, 5, 1))  # Light position
+    glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1))  # Ambient light
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.5, 0.5, 0.5, 1))  # Diffuse light
+    glLightfv(GL_LIGHT0, GL_SPECULAR, (1.0, 1.0, 1.0, 1))  # Specular light
 
     # Load the overlay texture
-    texture_id, tex_width, tex_height = load_texture('overlay.png')
+    global tex_width, tex_height
+    texture_id, tex_width, tex_height = load_texture("overlay.png")
 
     clock = pygame.time.Clock()
     save_screenshot_flag = False  # Initialize the screenshot flag
@@ -130,25 +194,42 @@ def main():
     # Main loop
     running = True
     # angle = 0  # For cube rotation
+    value = 0
+    mouse_button_held = False
+    font = pygame.font.Font(None, 36)
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            # elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEWHEEL:
+                value += event.y  # event.y is +1 for up scroll, -1 for down scroll
+
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                mouse_button_held = True
+            elif event.type == MOUSEBUTTONUP and event.button == 1:
+                mouse_button_held = False
                 save_screenshot_flag = True  # Set flag on mouse button press
 
-        
-
-        # Draw the scene
-        draw_scene()
+        if mouse_button_held:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            #scale mouse coordinates to OpenGL coordinates
+            world_width = 96
+            world_height = 60
+            pos_x = ((display[0]-mouse_x) / display[0]) * world_width - world_width / 2
+            pos_y = ((display[1] -mouse_y) / display[1]) * world_height # - world_height / 2
+            # Draw the scene
+            draw_scene(pos_x, pos_y, value)
 
         # Check if we need to save the screenshot
         if save_screenshot_flag:
             save_screenshot(display)
             save_screenshot_flag = False  # Reset the flag
-
+        text_surface = font.render(f"Value: {value}", True, (255, 255, 255))
+        screen.blit(text_surface, (50, 100))
+        # pygame.display.flip()
         # Draw the overlay image
         draw_overlay(texture_id, display)
 
@@ -156,6 +237,7 @@ def main():
         clock.tick(60)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
