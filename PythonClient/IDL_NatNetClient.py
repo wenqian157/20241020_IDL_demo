@@ -20,7 +20,7 @@ def screen_boundary(w, h):
 def project_pt_2_screen(point_3d):
     w = point_3d[0]
     h = point_3d[1]
-    # w, h = screen_boundary(w, h)
+    w, h = screen_boundary(w, h)
     return [w, h]
 
 def ray_plane_intersection(ray_origin, ray_direction, plane_point, plane_normal):
@@ -93,15 +93,22 @@ def receive_new_pos(rigid_body_list):
     # print(f"found rigid_body count: {len(rigid_body_list)}")
     if(len(rigid_body_list) != 2):
         return 
-    test_receiving_pos(rigid_body_list)
-
-    # test_receiving_pos(rigid_body_list)
-    pt_screen, pt_dome, dist = process_tracked_poses(rigid_body_list[0], rigid_body_list[1])
     
-    send_2_holophonix(pt_dome)
-    # send_2_screen(pt_screen, dist)
+    start = rigid_body_list[0]
+    end = rigid_body_list[1]
 
-def test_receiving_pos(rigid_body_list):
+    if start.id_num > end.id_num:
+        start = end
+        end = rigid_body_list[0]
+
+    broadcast_rigid_body(rigid_body_list)
+
+    pt_screen, pt_dome, dist = process_tracked_poses(start, end)
+    
+    # send_2_holophonix(pt_dome)
+    send_2_screen(pt_screen, dist)
+
+def broadcast_rigid_body(rigid_body_list):
     print(f"found rigid_body count: {len(rigid_body_list)}")
     for rigid_body in rigid_body_list:
        print(f"id: {rigid_body.id_num}")
@@ -111,7 +118,7 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
     # create ray from trakced 2 poses
     ray_origin = np.array([rigid_body_0.pos[0], rigid_body_0.pos[1], rigid_body_0.pos[2]])
     ray_end = np.array([rigid_body_1.pos[0], rigid_body_1.pos[1], rigid_body_1.pos[2]])
-    ray_direction = ray_end - ray_origin
+    ray_direction = ray_origin - ray_end
     distance = np.linalg.norm(ray_end - ray_origin)
 
     # intersect with screen

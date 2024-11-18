@@ -7,13 +7,22 @@ import threading
 from pynput.mouse import Listener
 
 
+def map_range(value, old_min, old_max, new_min, new_max):
+    return((value - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
+
+def map_point_2_pygame_window(x, y):
+    window_size = (1280, 800)
+    x = map_range(x, 4, -4, 0, window_size[0])
+    y = map_range(y, 5, 0, 0, window_size[1])
+    return x, y
+
 def update_draw(values):
     if values == None:
-        x, y = 0, 0
+        x, y = 640, 400
         dist = 10
     else:
-        x = values[0] * 100
-        y = values[1] * 100
+        x, y = values[0], values[1]
+        x, y = map_point_2_pygame_window(x, y)
         dist = values[2] * 100
 
     screen.fill((0, 0, 0))
