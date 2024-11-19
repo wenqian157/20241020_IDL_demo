@@ -1,36 +1,47 @@
+import asyncio
+import os
+import random
+import time
+from math import radians, tan
+
 import pygame
+from highrise_funcs import (
+    draw_scene,
+    generate_grid_structure,
+    save_screenshot,
+    setup_projection_and_lighting,
+)
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
 # from OpenGL.GLUT import *  # Import GLUT
 from pygame.locals import *
-import time
-import random
-from math import tan, radians
-import os
-
-from highrise_funcs import (
-    generate_grid_structure,
-    draw_scene,
-    save_screenshot,
-    setup_projection_and_lighting,
-)
 
 # Set a seed for reproducibility
 random.seed(42)
+
+overlay_texture_data = None
+
+
+async def load_rendered_img_async(img_folder):
+    print("Loading the rendered image asynchronously...")
+    await asyncio.sleep(1)  # Wait for 1 second before loading the texture
+    # texture_path = os.path.join(img_folder, "screenshot.png")
+    global overlay_texture_data
+    # load_texture("overlay.png")
+    overlay_texture_data = load_texture("overlay.png")
+    # print(overlay_texture_data)
+    print("Rendered image loaded!")
 
 
 def load_texture(image_path):
     """Load an image and convert it to a texture."""
     image = pygame.image.load(image_path)
-    # Remove the flip if image appears upside down
-    # image = pygame.transform.flip(image, False, True)
     image_data = pygame.image.tostring(image, "RGBA", True)
     width, height = image.get_rect().size
 
     texture_id = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, texture_id)
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
@@ -49,7 +60,7 @@ def load_texture(image_path):
     return texture_id, width, height
 
 
-def draw_overlay(texture_id, display_size):
+def draw_overlay(texture_id, tex_width, tex_height, display_size):
     """Draw the overlay image, maintaining aspect ratio."""
     # Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -110,23 +121,13 @@ def draw_overlay(texture_id, display_size):
     glEnable(GL_LIGHTING)  # Re-enable lighting
 
 
-def render_image():
-    """Simulate rendering process (e.g., API call) by waiting for 1 second."""
-    time.sleep(0.1)
-    return True  # Simulate that rendering completed successfully
-
-
 def main():
     # Initialize Pygame and create an OpenGL-compatible window
     pygame.init()
-    window_scale = 0.5
-    set_fullscreen = True
+    window_scale = 0.25
+    set_fullscreen = False
     screen_width, screen_height = 2560, 1600
     display = (int(screen_width * window_scale), int(screen_height * window_scale))
-
-    screenshot_folder = "screenshot"
-    os.makedirs(screenshot_folder, exist_ok=True)
-
     pygame.display.set_caption("GenAI_render")
     if set_fullscreen:
         screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL | FULLSCREEN)
@@ -138,20 +139,17 @@ def main():
     # Generate the grid structure for the building
     grid_structure = generate_grid_structure()
 
-    # Load the overlay texture
-    global tex_width, tex_height
-    texture_id, tex_width, tex_height = load_texture("overlay.png")
+    save_screenshot_flag = False
+    screenshot_folder = "screenshot"
+    os.makedirs(screenshot_folder, exist_ok=True)
 
-    clock = pygame.time.Clock()
-    save_screenshot_flag = False  # Initialize the screenshot flag
+    global overlay_texture_data
     mouse_button_held = False
-    rendering = False
-    rendering_completed = False
-
-    # Main loop
     running = True
     value = 6
     last_x, last_y, last_value = 0, 20, 6
+
+    # Main loop
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -160,11 +158,10 @@ def main():
                 running = False
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 mouse_button_held = True
-                rendering_completed = False
+                overlay_texture_data = None
             elif event.type == MOUSEBUTTONUP and event.button == 1:
                 mouse_button_held = False
-                save_screenshot_flag = True  # Set flag on mouse button press
-                rendering = True
+                save_screenshot_flag = True
             elif event.type == pygame.MOUSEWHEEL:
                 value += event.y  # event.y is +1 for up scroll, -1 for down scroll
 
@@ -186,23 +183,18 @@ def main():
 
         # Check if we need to save the screenshot
         if save_screenshot_flag:
-            # add a timestamp to the filename
-            # timestamp = time.strftime("%Y%m%d-%H%M%S")
-            # save_screenshot(display, f"{timestamp}_screenshot.png")
             save_screenshot(display, os.path.join(screenshot_folder, "screenshot.png"))
-            save_screenshot_flag = False  # Reset the flag
+            asyncio.run(load_rendered_img_async(screenshot_folder))
+            save_screenshot_flag = False
 
-        if rendering:
-            rendering_completed = render_image()
-            rendering = False
-        elif rendering_completed:
-            draw_overlay(texture_id, display)
+        if overlay_texture_data is not None:
+            texture_id, tex_width, tex_height = overlay_texture_data
+            draw_overlay(texture_id, tex_width, tex_height, display)
         else:
             # Display the last state of the scene while rendering is happening
             draw_scene(last_x, last_y, last_value, grid_structure)
 
         pygame.display.flip()
-        clock.tick(60)
 
     pygame.quit()
 

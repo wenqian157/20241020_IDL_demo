@@ -1,12 +1,28 @@
 
-## install ComfyUI
+# run ai image generation
+
+1. start ComfyUI (setup instructions are below)
+2. drag the workflow_highrise.png image from folder _gitrepo_/image_gen/workflows onto the comfyUI canvas. this will open the workflow
+3. in the LoadImagesFromPath Node set the path to _gitrepo_/image_gen/screenshot
+4. set the styling image in the LoadImage node below the LoadImagesFromPath node to the styling_reference.png image from _gitrepo_/image_gen/workflows
+
+# install ComfyUI
+
+## On Windows and with nvidia card
 
 1. install [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing)
-2. [direct download link here](https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z)
+2. [direct download for the portable distribution link here](https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z)
 
 
 3. update the install folder in `install_compfy.py`. set it to the folder in which your `ComfyUI` folder is located.
 4. run `python install_compfy.py` to download and install extensions and models.
+
+5. start comfyUI with `run_nvidia_gpu.bat` from the portable distribution folder. It will install some stuff and stop at "press any key to continue" several times. each time start it over from the bat file again until the comfyUI server starts.
+6. once the comfyUI opens in the browser, click on the cogwheel for settings and in comfyui settings select BETA Menu Enable Top.
+7. Then click on Manager and in "Custom Nodes Manager" Filter to "installed". For all that failed click Try Fix. Then click restart. Confirm with OK to reboot the server. Once it reboots, check again if all installed nodes loaded properly. if not repeat this step.
+
+
+# Older notes for refernce
 
 5. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 
