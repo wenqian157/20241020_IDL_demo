@@ -27,11 +27,19 @@ def install_manager_and_extensions(install_folder):
     os.chdir(custom_nodes_folder)
     custom_extensions = [
         'https://github.com/ltdrdata/ComfyUI-Manager',
+        'https://github.com/Fannovel16/comfyui_controlnet_aux',
+        'https://github.com/BadCafeCode/masquerade-nodes-comfyui',
         'https://github.com/cubiq/ComfyUI_essentials',
         'https://github.com/cubiq/ComfyUI_IPAdapter_plus',
-        'https://github.com/Fannovel16/comfyui_controlnet_aux',
+        'https://github.com/rgthree/rgthree-comfy',
+        'https://github.com/Lerc/canvas_tab',
         'https://github.com/chrisgoringe/cg-use-everywhere',
-        'https://github.com/Lerc/canvas_tab'
+        'https://github.com/shadowcz007/comfyui-mixlab-nodes',
+        # 'https://github.com/taabata/LCM_Inpaint_Outpaint_Comfy',
+        # 'https://github.com/palant/image-resize-comfyui',
+        'https://github.com/GraftingRayman/ComfyUI_GraftingRayman',
+        # 'https://github.com/ai-shizuka/ComfyUI-tbox',
+        
     ]
 
     for repo_url in custom_extensions:
