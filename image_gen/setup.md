@@ -67,12 +67,12 @@ ComfyUI Scribbles to Masterpieces Workflow! - https://www.youtube.com/watch?v=Yh
 ## resolutions for SDXL
 stable-diffusion-xl-1024-v0-9 supports generating images at the following dimensions:
 
-- 1024 x 1024
-- 1152 x 896
-- 896 x 1152
-- 1216 x 832
+- 1024 x 1024 = 1 : 1
+- 1152 x 896 = 1,2857142857 : 1
+- 896 x 1152 
+- 1216 x 832 = 1,4615384615 : 1
 - 832 x 1216
-- 1344 x 768
+- 1344 x 768 = 1,75 : 1
 - 768 x 1344
-- 1536 x 640
+- 1536 x 640 = 2,4 : 1
 - 640 x 1536
