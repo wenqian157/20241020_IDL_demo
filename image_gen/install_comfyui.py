@@ -74,7 +74,7 @@ def download_models(install_folder):
         "https://huggingface.co/stabilityai/control-lora/resolve/main/control-LoRAs-rank256/control-lora-canny-rank256.safetensors?download=true": os.path.join(
             models_folder, "controlnet", "control-lora-canny-rank256.safetensors"
         ),
-        "https://huggingface.co/h94/IP-Adapter/blob/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors?download=true": os.path.join(
+        "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors?download=true": os.path.join(
             models_folder, "ipadapter", "ip-adapter-plus_sdxl_vit-h.safetensors"
         ),
     }
