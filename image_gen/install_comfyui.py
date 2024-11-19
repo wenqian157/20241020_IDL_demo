@@ -83,7 +83,7 @@ def download_models(install_folder):
 
 # Run installation functions
 def main():
-    install_folder = "D:\\Anton"
+    install_folder = "D:\\Anton\\ComfyUI_windows_portable_nvidia\\ComfyUI_windows_portable_nvidia"
     if not os.path.exists(install_folder):
         print(f"Installation folder does not exist: {install_folder}")
         return
