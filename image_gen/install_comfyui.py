@@ -35,10 +35,10 @@ def install_manager_and_extensions(install_folder):
         'https://github.com/Lerc/canvas_tab',
         'https://github.com/chrisgoringe/cg-use-everywhere',
         'https://github.com/shadowcz007/comfyui-mixlab-nodes',
-        # 'https://github.com/taabata/LCM_Inpaint_Outpaint_Comfy',
-        # 'https://github.com/palant/image-resize-comfyui',
+        'https://github.com/taabata/LCM_Inpaint_Outpaint_Comfy',
+        'https://github.com/palant/image-resize-comfyui',
         'https://github.com/GraftingRayman/ComfyUI_GraftingRayman',
-        # 'https://github.com/ai-shizuka/ComfyUI-tbox',
+        'https://github.com/ai-shizuka/ComfyUI-tbox',
         
     ]
 
