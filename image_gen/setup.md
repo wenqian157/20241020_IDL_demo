@@ -2,7 +2,13 @@
 ## install ComfyUI
 
 1. install [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing)
-2. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
+2. [direct download link here](https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z)
+
+
+3. update the install folder in `install_compfy.py`. set it to the folder in which your `ComfyUI` folder is located.
+4. run `python install_compfy.py` to download and install extensions and models.
+
+5. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 
 run ComfyUI and in the manager install the following:
 1. install [ComfyUI Essentials](https://github.com/cubiq/ComfyUI_essentials)
@@ -12,6 +18,11 @@ run ComfyUI and in the manager install the following:
 5. install [Canvas Tab](https://github.com/Lerc/canvas_tab)
 
 ## models
+
+https://civitai.com/models/139562/realvisxl-v50
+
+Use Turbo models with DPM++ SDE Karras sampler, 4-10 steps and CFG Scale 1-2.5
+Use Lightning models with DPM++ SDE Karras / DPM++ SDE sampler, 4-6 steps and CFG Scale 1-2
 
 put in ComfyUI/models/checkpoints
 https://huggingface.co/imagepipeline/Copax-TimeLessXL-SDXL1.0/blob/main/copaxTimelessxlSDXL1_v9.safetensors
@@ -67,12 +78,12 @@ ComfyUI Scribbles to Masterpieces Workflow! - https://www.youtube.com/watch?v=Yh
 ## resolutions for SDXL
 stable-diffusion-xl-1024-v0-9 supports generating images at the following dimensions:
 
-- 1024 x 1024
-- 1152 x 896
-- 896 x 1152
-- 1216 x 832
+- 1024 x 1024 = 1 : 1
+- 1152 x 896 = 1,2857142857 : 1
+- 896 x 1152 
+- 1216 x 832 = 1,4615384615 : 1
 - 832 x 1216
-- 1344 x 768
+- 1344 x 768 = 1,75 : 1
 - 768 x 1344
-- 1536 x 640
+- 1536 x 640 = 2,4 : 1
 - 640 x 1536
