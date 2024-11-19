@@ -95,13 +95,13 @@ def download_models(install_folder):
 # Run installation functions
 def main():
     install_folder = (
-        "D:\\Anton\\ComfyUI_windows_portable_nvidia\\ComfyUI_windows_portable_nvidia"
+        "D:\\Anton\\ComfyUI_windows_portable"
     )
     if not os.path.exists(install_folder):
         print(f"Installation folder does not exist: {install_folder}")
         return
 
-    # install_manager_and_extensions(install_folder)
+    install_manager_and_extensions(install_folder)
     download_models(install_folder)
 
 
