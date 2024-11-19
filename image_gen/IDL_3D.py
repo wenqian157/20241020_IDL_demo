@@ -36,11 +36,17 @@ async def load_rendered_img_async(img_folder):
             if os.path.isfile(file_path) and file_name.endswith(".png"):
                 file_mod_time = os.path.getmtime(file_path)
                 if file_mod_time > start_time:
-                    # Load the new texture
-                    global overlay_texture_data
-                    overlay_texture_data = load_texture(file_path)
-                    print("Rendered image loaded!")
-                    return
+                    # Retry loading if there is an issue due to a locked file
+                    retries = 5
+                    for attempt in range(retries):
+                        try:
+                            global overlay_texture_data
+                            overlay_texture_data = load_texture(file_path)
+                            print("Rendered image loaded!")
+                            return
+                        except FileNotFoundError as e:
+                            print(f"Attempt {attempt + 1} failed: {e}. Retrying...")
+                            await asyncio.sleep(0.5)  # Wait an additional 500ms before retrying
 
 
 def main():
