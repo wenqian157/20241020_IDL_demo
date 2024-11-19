@@ -49,16 +49,6 @@ def draw_box(size):
         (0, 1, 5, 4),  # Bottom
     ]
 
-    # Assign colors for each face (optional)
-    # colors = [
-    #     (1, 0, 0),  # Red
-    #     (0, 1, 0),  # Green
-    #     (0, 0, 1),  # Blue
-    #     (1, 1, 0),  # Yellow
-    #     (1, 0, 1),  # Magenta
-    #     (0, 1, 1),  # Cyan
-    # ]
-
     glBegin(GL_QUADS)
     for i, face in enumerate(faces):
         glNormal3fv(normals[i])  # Set the normal for the current face
@@ -170,7 +160,7 @@ def generate_grid_structure():
 
 
 def draw_scene(pos_x, pos_y, distance, grid_structure):
-    print(grid_structure)
+    # print(grid_structure)
     # Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
