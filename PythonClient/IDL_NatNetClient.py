@@ -105,7 +105,7 @@ def receive_new_pos(rigid_body_list):
 
     pt_screen, pt_dome, dist = process_tracked_poses(start, end)
     
-    # send_2_holophonix(pt_dome)
+    send_2_holophonix(pt_dome, dist)
     send_2_screen(pt_screen, dist)
 
 def broadcast_rigid_body(rigid_body_list):
@@ -137,7 +137,7 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
     # intersect with dome
     # fixed dome in the space
     dome_center = np.array([0, 0, 0])              
-    dome_radius = 5.0                             
+    dome_radius = 7.0                             
     dome_up_direction = np.array([0, 1, 0])
 
     pt_dome = ray_dome_intersection(
@@ -158,10 +158,18 @@ def send_2_screen(pt_screen, dist):
     # MESSAGE = "hello!"
     # screen_client.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
 
-def send_2_holophonix(pt_dome):
-    if(pt_dome is None):
+def send_2_holophonix(pt_dome, dist):
+    if(pt_dome is None) or (dist is None):
         return 
+    
+    # send sound location
     holophonix_client.send_message("/track/1/xyz", tuple([pt_dome[0], pt_dome[1], pt_dome[2]]))
+
+    # send sound reverberation
+    holophonix_client.send_message("track", dist)
+
+    # send room size
+    holophonix_client.send_message("track", dist)
 
 if __name__ == "__main__":
     # holophonix client
