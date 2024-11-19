@@ -1,15 +1,62 @@
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *  # Import GLUT
+# from OpenGL.GLUT import *  # Import GLUT
 from pygame.locals import *
 import time
 import random
 from math import tan, radians
+import os
 
 # Set a seed for reproducibility
 random.seed(42)
 
+def draw_box(size):
+    """Draws a cube with proper lighting and shading."""
+    half_size = size / 2.0
+
+    # Define vertices for the cube
+    vertices = [
+        # Front face
+        (-half_size, -half_size,  half_size),
+        ( half_size, -half_size,  half_size),
+        ( half_size,  half_size,  half_size),
+        (-half_size,  half_size,  half_size),
+
+        # Back face
+        (-half_size, -half_size, -half_size),
+        ( half_size, -half_size, -half_size),
+        ( half_size,  half_size, -half_size),
+        (-half_size,  half_size, -half_size),
+    ]
+
+    # Define normals for each face
+    normals = [
+        (0, 0, 1),  # Front
+        (0, 0, -1), # Back
+        (-1, 0, 0), # Left
+        (1, 0, 0),  # Right
+        (0, 1, 0),  # Top
+        (0, -1, 0), # Bottom
+    ]
+
+    # Define indices for the six cube faces
+    faces = [
+        (0, 1, 2, 3),  # Front
+        (4, 5, 6, 7),  # Back
+        (0, 4, 7, 3),  # Left
+        (1, 5, 6, 2),  # Right
+        (3, 2, 6, 7),  # Top
+        (0, 1, 5, 4),  # Bottom
+    ]
+
+    glBegin(GL_QUADS)
+    for i, face in enumerate(faces):
+        glNormal3fv(normals[i])  # Set the normal for the current face
+        # glColor3fv(colors[i])    # Set the color for the current face (optional)
+        for vertex in face:
+            glVertex3fv(vertices[vertex])  # Pass each vertex
+    glEnd()
 
 def load_texture(image_path):
     """Load an image and convert it to a texture."""
@@ -114,7 +161,7 @@ def generate_grid_structure():
 
 
 def draw_scene(pos_x, pos_y, distance, grid_structure):
-    print(grid_structure)
+    # print(grid_structure)
     # Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
@@ -158,7 +205,8 @@ def draw_scene(pos_x, pos_y, distance, grid_structure):
                     glScalef(axes_width, floor_height, axes_width)
                     # Set color for the building
                     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1, 1, 1, 1))
-                    glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+                    # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+                    draw_box(1)
                     glPopMatrix()
 
     # Draw the frame (beams and columns)
@@ -177,7 +225,8 @@ def draw_scene(pos_x, pos_y, distance, grid_structure):
             glTranslatef(column_x, column_y, column_z)
             # Scale to the desired dimensions
             glScalef(frame_d, building_height, frame_d)
-            glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+            # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+            draw_box(1)
             glPopMatrix()
 
     # Draw horizontal beams at each floor level
@@ -191,7 +240,8 @@ def draw_scene(pos_x, pos_y, distance, grid_structure):
             glTranslatef(beam_x, beam_y, beam_z)
             # Scale to the desired dimensions
             glScalef(axes_x * axes_width + frame_d, frame_d, frame_d)
-            glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+            # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+            draw_box(1)
             glPopMatrix()
         for x in range(axes_x + 1):
             glPushMatrix()
@@ -202,7 +252,8 @@ def draw_scene(pos_x, pos_y, distance, grid_structure):
             glTranslatef(beam_x, beam_y, beam_z)
             # Scale to the desired dimensions
             glScalef(frame_d, frame_d, axes_z * axes_width + frame_d)
-            glutSolidCube(1)
+            # glutSolidCube(1)
+            draw_box(1)
             glPopMatrix()
 
     # Draw the second box the cafe
@@ -228,7 +279,8 @@ def draw_scene(pos_x, pos_y, distance, grid_structure):
     glScalef(cafe_width, cafe_height, axes_width*2.5)
     # Set color for the cafe
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.3, 0.3, 0.8, 1))
-    glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+    # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
+    draw_box(1)
     glPopMatrix()
 
 
@@ -260,14 +312,18 @@ def main():
     set_fullscreen = True
     screen_width, screen_height = 2560, 1600
     display = (int(screen_width * window_scale), int(screen_height * window_scale))
+
+    screenshot_folder = "screenshot"
+    # if not os.path.exists(screenshot_folder):
+    os.makedirs(screenshot_folder, exist_ok=True)
+
     pygame.display.set_caption("GenAI_render")
     if set_fullscreen:
         screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL | FULLSCREEN)
     else:
         screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
-    # Initialize GLUT
-    glutInit([])
+    
 
     # Set up perspective projection
     glMatrixMode(GL_PROJECTION)
@@ -283,7 +339,7 @@ def main():
     far = 150.0
     factor = near/80
     top = 60*factor
-    bottom = -4*factor
+    bottom = -8*factor
     right = 50*factor
     left = -right
 
@@ -312,7 +368,7 @@ def main():
     global tex_width, tex_height
     texture_id, tex_width, tex_height = load_texture("overlay.png")
 
-    clock = pygame.time.Clock()
+    # clock = pygame.time.Clock()
     save_screenshot_flag = False  # Initialize the screenshot flag
     mouse_button_held = False
     rendering = False
@@ -353,7 +409,10 @@ def main():
 
         # Check if we need to save the screenshot
         if save_screenshot_flag:
-            save_screenshot(display)
+            # add a timestamp to the filename
+            # timestamp = time.strftime("%Y%m%d-%H%M%S")
+            # save_screenshot(display, f"{timestamp}_screenshot.png")            
+            save_screenshot(display, os.path.join(screenshot_folder, "screenshot.png"))
             save_screenshot_flag = False  # Reset the flag
 
         if rendering:
@@ -366,7 +425,7 @@ def main():
             draw_scene(last_x, last_y, last_value, grid_structure)
 
         pygame.display.flip()
-        clock.tick(60)
+        # clock.tick(60)
 
     pygame.quit()
 
