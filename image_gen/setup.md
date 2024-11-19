@@ -4,13 +4,11 @@
 1. install [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing)
 2. [direct download link here](https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z)
 
-install with git
 
-git clone https://github.com/comfyanonymous/ComfyUI
+3. update the install folder in `install_compfy.py`. set it to the folder in which your `ComfyUI` folder is located.
+4. run `python install_compfy.py` to download and install extensions and models.
 
-
-
-3. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
+5. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 
 run ComfyUI and in the manager install the following:
 1. install [ComfyUI Essentials](https://github.com/cubiq/ComfyUI_essentials)
