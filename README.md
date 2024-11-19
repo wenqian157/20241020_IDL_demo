@@ -1,10 +1,10 @@
 # SETUP
 
-    conda create -n idldemo python=3
+    conda create -n idldemo python=3.13.0
     conda activate idldemo
     pip install -r requirements.txt
 
-## On windows
+## DONT DO, BUT On windows (ONLY IF YOU NEED GLUT)
 
 from: https://stackoverflow.com/questions/65699670/pyopengl-opengl-error-nullfunctionerror-attempt-to-call-an-undefined-functio
 
