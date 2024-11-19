@@ -3,6 +3,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *  # Import GLUT
 from pygame.locals import *
+import time
 
 
 def load_texture(image_path):
@@ -34,18 +35,19 @@ def load_texture(image_path):
     return texture_id, width, height
 
 
-def draw_overlay(texture_id, display_size, opacity=0.5):
-    """Draw the overlay image with blending, maintaining aspect ratio."""
+def draw_overlay(texture_id, display_size):
+    """Draw the overlay image, maintaining aspect ratio."""
+    # Clear the screen and depth buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
     display_width, display_height = display_size
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture_id)
 
     glDisable(GL_LIGHTING)  # Disable lighting before drawing the overlay
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    # Set transparency
-    glColor4f(1, 1, 1, opacity)
+    # Set color
+    glColor4f(1, 1, 1, 1)
 
     # Save the current projection matrix
     glMatrixMode(GL_PROJECTION)
@@ -91,21 +93,8 @@ def draw_overlay(texture_id, display_size, opacity=0.5):
     glPopMatrix()
 
     glDisable(GL_TEXTURE_2D)
-    glDisable(GL_BLEND)
     glEnable(GL_LIGHTING)  # Re-enable lighting
 
-
-# def draw_scene(pos_x, pos_y, distance):
-#     # Clear the screen and depth buffer
-#     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-#     glEnable(GL_DEPTH_TEST)
-
-#     # Set material properties
-#     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.8, 0.5, 0.2, 1))  # Cube color
-#     glMaterialfv(GL_FRONT, GL_SPECULAR, (1.0, 1.0, 1.0, 1))  # Specular color
-#     glMaterialf(GL_FRONT, GL_SHININESS, 50)  # Shininess factor
-
-#     glutSolidCube(2)
 
 def draw_scene(pos_x, pos_y, distance):
     # Clear the screen and depth buffer
@@ -147,6 +136,12 @@ def save_screenshot(display, filename="cube_screenshot.png"):
     print(f"Screenshot saved as {filename}")
 
 
+def render_image():
+    """Simulate rendering process (e.g., API call) by waiting for 1 second."""
+    time.sleep(1)
+    return True  # Simulate that rendering completed successfully
+
+
 def main():
     # Initialize Pygame and create an OpenGL-compatible window
     pygame.init()
@@ -167,12 +162,8 @@ def main():
     glMatrixMode(GL_PROJECTION)
     gluPerspective(45, (display[0] / display[1]), 0.1, 150.0)
     glMatrixMode(GL_MODELVIEW)
-    # Set the viewpoint explicitly
-    gluLookAt(0.0, 20.0, -100.0,  # Move camera 10 units along z-axis
-          0.0, 20.0, 0.0,   # Look at the origin
-          0.0, 1.0, 0.0)   # Up direction along y-axis
-
-    # glTranslatef(0.0, 0.0, -5)
+    # camera position, look at position, up direction
+    gluLookAt(0.0, 20.0, -100.0, 0.0, 20.0, 0.0, 0.0, 1.0, 0.0)
 
     # Enable lighting
     glEnable(GL_LIGHTING)
@@ -190,48 +181,54 @@ def main():
 
     clock = pygame.time.Clock()
     save_screenshot_flag = False  # Initialize the screenshot flag
+    mouse_button_held = False
+    rendering = False
+    rendering_completed = False
 
     # Main loop
     running = True
-    # angle = 0  # For cube rotation
     value = 0
-    mouse_button_held = False
-    font = pygame.font.Font(None, 36)
+    last_x, last_y, last_value = 0, 0, 0
     while running:
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 running = False
-            # elif event.type == pygame.MOUSEBUTTONDOWN:
-            elif event.type == pygame.MOUSEWHEEL:
-                value += event.y  # event.y is +1 for up scroll, -1 for down scroll
-
             elif event.type == MOUSEBUTTONDOWN and event.button == 1:
                 mouse_button_held = True
+                rendering_completed = False
             elif event.type == MOUSEBUTTONUP and event.button == 1:
                 mouse_button_held = False
                 save_screenshot_flag = True  # Set flag on mouse button press
+                rendering = True
+            elif event.type == pygame.MOUSEWHEEL:
+                value += event.y  # event.y is +1 for up scroll, -1 for down scroll
 
         if mouse_button_held:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            #scale mouse coordinates to OpenGL coordinates
             world_width = 96
             world_height = 60
-            pos_x = ((display[0]-mouse_x) / display[0]) * world_width - world_width / 2
-            pos_y = ((display[1] -mouse_y) / display[1]) * world_height # - world_height / 2
-            # Draw the scene
+            pos_x = (
+                (display[0] - mouse_x) / display[0]
+            ) * world_width - world_width / 2
+            pos_y = ((display[1] - mouse_y) / display[1]) * world_height
+            last_x, last_y, last_value = pos_x, pos_y, value
             draw_scene(pos_x, pos_y, value)
 
         # Check if we need to save the screenshot
         if save_screenshot_flag:
             save_screenshot(display)
             save_screenshot_flag = False  # Reset the flag
-        text_surface = font.render(f"Value: {value}", True, (255, 255, 255))
-        screen.blit(text_surface, (50, 100))
-        # pygame.display.flip()
-        # Draw the overlay image
-        draw_overlay(texture_id, display)
+
+        if rendering:
+            rendering_completed = render_image()
+            rendering = False
+        elif rendering_completed:
+            draw_overlay(texture_id, display)
+        else:
+            # Display the last state of the scene while rendering is happening
+            draw_scene(last_x, last_y, last_value)
 
         pygame.display.flip()
         clock.tick(60)
