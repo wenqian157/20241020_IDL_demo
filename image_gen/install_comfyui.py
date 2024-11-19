@@ -77,6 +77,12 @@ def download_models(install_folder):
         "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors?download=true": os.path.join(
             models_folder, "ipadapter", "ip-adapter-plus_sdxl_vit-h.safetensors"
         ),
+        "https://huggingface.co/laion/CLIP-ViT-H-14-laion2B-s32B-b79K/resolve/main/open_clip_pytorch_model.safetensors?download=true": os.path.join(
+            models_folder, "clip_vision", "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
+        ),
+        "https://civitai.com/api/download/models/798204?type=Model&format=SafeTensor&size=full&fp=fp16": os.path.join(
+            models_folder, "checkpoints", "realvisxlV50_v50LightningBakedvae.safetensors"
+        ),
     }
     # Download checkpoints
     for link, path in models_dict.items():
@@ -95,8 +101,8 @@ def main():
         print(f"Installation folder does not exist: {install_folder}")
         return
 
-    install_manager_and_extensions(install_folder)
-    # download_models(install_folder)
+    # install_manager_and_extensions(install_folder)
+    download_models(install_folder)
 
 
 if __name__ == "__main__":
