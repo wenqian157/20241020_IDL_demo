@@ -47,7 +47,7 @@ def on_click(x, y, button, pressed):
     if pressed:
         if button.name == "left":
             print("left")
-            update_ai_generate()
+            # update_ai_generate()
         elif button.name == "right":
             print("right")
 
@@ -77,8 +77,7 @@ if __name__ == "__main__":
     pygame.display.set_caption("draw a 2d point")
 
     receice_thread = threading.Thread(target=receive)
-    receice_thread.daemon = True
-    time.sleep(1)
+    # receice_thread.daemon = True
     receice_thread.start()
     
     # set up listener to for mouse click
@@ -92,7 +91,7 @@ if __name__ == "__main__":
         user_input = input('Enter q to quit')
         if user_input == "q":
             sock.close()
-            receice_thread.join()
+            # receice_thread.join()
             pygame.quit()
             sys.exit()
             listener.stop()

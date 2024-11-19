@@ -105,9 +105,9 @@ def receive_new_pos(rigid_body_list):
 
     pt_screen, pt_dome, dist = process_tracked_poses(start, end)
     
-    # send_2_holophonix(pt_dome, dist)
-    send_2_visual(pt_screen, dist)
-    send_2_sound(pt_dome, dist)
+    # send_2_visual(pt_screen, dist)
+    # send_2_sound(pt_dome, dist)
+    send_2_visual_and_sound(pt_screen, pt_dome, dist)
 
 def broadcast_rigid_body(rigid_body_list):
     print(f"found rigid_body count: {len(rigid_body_list)}")
@@ -126,10 +126,6 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
     # fixed plane
     plane_point = np.array([0, 0, 2.7])
     plane_normal = np.array([0, 0, 1])
-
-    # ray_origin = np.array([0, 0, 0])
-    # ray_end = np.array([1, 1, 1])
-    # ray_direction = ray_end - ray_origin
     
     pt_screen = ray_plane_intersection(
         ray_origin, ray_direction, plane_point, plane_normal
@@ -138,7 +134,7 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
     # intersect with dome
     # fixed dome in the space
     dome_center = np.array([0, 0, 0])              
-    dome_radius = 7.0                             
+    dome_radius = 4.0                             
     dome_up_direction = np.array([0, 1, 0])
 
     pt_dome = ray_dome_intersection(
@@ -146,6 +142,19 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
         )
     
     return pt_screen, pt_dome, distance
+
+def send_2_visual_and_sound(pt_screen, pt_dome, dist):
+    if(pt_screen is None) or (pt_dome is None) or (dist is None):
+        return 
+    
+    
+    w = pt_screen[0]
+    h = pt_screen[1]
+    x, y, z = pt_dome[0], pt_dome[1], pt_dome[2]
+
+    data = (w, h, x, y, z, dist)
+    packed_data = struct.pack("ffffff", *data)
+    screen_client.sendto(packed_data, (UDP_IP, UDP_PORT_COMBINED))
 
 def send_2_visual(pt_screen, dist):
     if(pt_screen is None) or (dist is None):
@@ -162,31 +171,19 @@ def send_2_sound(pt_dome, dist):
         return 
     
     x, y, z = pt_dome[0], pt_dome[1], pt_dome[2]
+    data = (x, y, z, dist)
+    print(data)
 
-    packed_data = struct.pack("!ffff", x, y, z, dist)
+    packed_data = struct.pack("ffff", *data)
     screen_client.sendto(packed_data, (UDP_IP, UDP_PORT_SOUND))
 
-def send_2_holophonix(pt_dome, dist):
-    if(pt_dome is None) or (dist is None):
-        return 
-    
-    # send sound location
-    holophonix_client.send_message("/track/1/xyz", tuple([pt_dome[0], pt_dome[1], pt_dome[2]]))
-
-    # send sound reverberation
-    holophonix_client.send_message("track", dist)
-
-    # send room size
-    holophonix_client.send_message("track", dist)
-
 if __name__ == "__main__":
-    # holophonix client
-    holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
 
     # screen projection client
     UDP_IP = "127.0.0.1"
     UDP_PORT_VISUAL = 5005
-    UDP_PORT_SOUND = 5006
+    UDP_PORT_SOUND = 12345
+    UDP_PORT_COMBINED = 12345
 
     screen_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
