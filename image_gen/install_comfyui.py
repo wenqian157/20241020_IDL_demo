@@ -20,18 +20,18 @@ def create_directory(path):
         print(f"Directory already exists: {path}")
 
 # Install ComfyUI
-def install_comfyui(install_folder):
-    comfyui_folder = os.path.join(install_folder, "ComfyUI")
-    create_directory(comfyui_folder)
-    comfyui_zip_url = "https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z"
-    comfyui_zip_path = os.path.join(install_folder, "ComfyUI_windows_portable_nvidia.7z")
-    download_file(comfyui_zip_url, comfyui_zip_path)
+# def install_comfyui(install_folder):
+#     comfyui_folder = os.path.join(install_folder, "ComfyUI")
+#     create_directory(comfyui_folder)
+#     comfyui_zip_url = "https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z"
+#     comfyui_zip_path = os.path.join(install_folder, "ComfyUI_windows_portable_nvidia.7z")
+#     download_file(comfyui_zip_url, comfyui_zip_path)
 
-    # Unpack the 7z file
-    print(f"Unpacking {comfyui_zip_path} to {install_folder}...")
-    with py7zr.SevenZipFile(comfyui_zip_path, mode='r') as archive:
-        archive.extractall(path=install_folder)
-    print(f"Unpacked {comfyui_zip_path} to {install_folder}")
+#     # Unpack the 7z file
+#     print(f"Unpacking {comfyui_zip_path} to {install_folder}...")
+#     with py7zr.SevenZipFile(comfyui_zip_path, mode='r') as archive:
+#         archive.extractall(path=install_folder)
+#     print(f"Unpacked {comfyui_zip_path} to {install_folder}")
 
 # Install Manager and Extensions
 def install_manager_and_extensions(install_folder):
@@ -88,7 +88,7 @@ def main():
         print(f"Installation folder does not exist: {install_folder}")
         return
 
-    install_comfyui(install_folder)
+    # install_comfyui(install_folder)
     install_manager_and_extensions(install_folder)
     # download_models(install_folder)
 
