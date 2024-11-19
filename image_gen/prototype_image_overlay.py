@@ -350,7 +350,7 @@ def main():
     far = 150.0
     factor = near/80
     top = 60*factor
-    bottom = -4*factor
+    bottom = -8*factor
     right = 50*factor
     left = -right
 
