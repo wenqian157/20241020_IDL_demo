@@ -105,8 +105,9 @@ def receive_new_pos(rigid_body_list):
 
     pt_screen, pt_dome, dist = process_tracked_poses(start, end)
     
-    send_2_holophonix(pt_dome, dist)
-    send_2_screen(pt_screen, dist)
+    # send_2_holophonix(pt_dome, dist)
+    send_2_visual(pt_screen, dist)
+    send_2_sound(pt_dome, dist)
 
 def broadcast_rigid_body(rigid_body_list):
     print(f"found rigid_body count: {len(rigid_body_list)}")
@@ -146,7 +147,7 @@ def process_tracked_poses(rigid_body_0, rigid_body_1):
     
     return pt_screen, pt_dome, distance
 
-def send_2_screen(pt_screen, dist):
+def send_2_visual(pt_screen, dist):
     if(pt_screen is None) or (dist is None):
         return 
     
@@ -154,9 +155,16 @@ def send_2_screen(pt_screen, dist):
     h = pt_screen[1]
 
     packed_data = struct.pack("!fff", w, h, dist)
-    screen_client.sendto(packed_data, (UDP_IP, UDP_PORT))
-    # MESSAGE = "hello!"
-    # screen_client.sendto(MESSAGE.encode(), (UDP_IP, UDP_PORT))
+    screen_client.sendto(packed_data, (UDP_IP, UDP_PORT_VISUAL))
+
+def send_2_sound(pt_dome, dist):
+    if(pt_dome is None) or (dist is None):
+        return 
+    
+    x, y, z = pt_dome[0], pt_dome[1], pt_dome[2]
+
+    packed_data = struct.pack("!ffff", x, y, z, dist)
+    screen_client.sendto(packed_data, (UDP_IP, UDP_PORT_SOUND))
 
 def send_2_holophonix(pt_dome, dist):
     if(pt_dome is None) or (dist is None):
@@ -177,7 +185,8 @@ if __name__ == "__main__":
 
     # screen projection client
     UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
+    UDP_PORT_VISUAL = 5005
+    UDP_PORT_SOUND = 5006
 
     screen_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
