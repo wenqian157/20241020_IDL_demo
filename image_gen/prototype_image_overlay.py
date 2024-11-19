@@ -6,15 +6,13 @@ from math import radians, tan
 
 import pygame
 from highrise_funcs import (
+    draw_overlay,
     draw_scene,
     generate_grid_structure,
+    load_texture,
     save_screenshot,
     setup_projection_and_lighting,
 )
-from OpenGL.GL import *
-from OpenGL.GLU import *
-
-# from OpenGL.GLUT import *  # Import GLUT
 from pygame.locals import *
 
 # Set a seed for reproducibility
@@ -24,101 +22,11 @@ overlay_texture_data = None
 
 
 async def load_rendered_img_async(img_folder):
-    print("Loading the rendered image asynchronously...")
+    print("Loading the dummy rendered image asynchronously...")
     await asyncio.sleep(1)  # Wait for 1 second before loading the texture
-    # texture_path = os.path.join(img_folder, "screenshot.png")
     global overlay_texture_data
-    # load_texture("overlay.png")
-    overlay_texture_data = load_texture("overlay.png")
-    # print(overlay_texture_data)
-    print("Rendered image loaded!")
-
-
-def load_texture(image_path):
-    """Load an image and convert it to a texture."""
-    image = pygame.image.load(image_path)
-    image_data = pygame.image.tostring(image, "RGBA", True)
-    width, height = image.get_rect().size
-
-    texture_id = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, texture_id)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        width,
-        height,
-        0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
-        image_data,
-    )
-
-    return texture_id, width, height
-
-
-def draw_overlay(texture_id, tex_width, tex_height, display_size):
-    """Draw the overlay image, maintaining aspect ratio."""
-    # Clear the screen and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-    display_width, display_height = display_size
-    glEnable(GL_TEXTURE_2D)
-    glBindTexture(GL_TEXTURE_2D, texture_id)
-
-    glDisable(GL_LIGHTING)  # Disable lighting before drawing the overlay
-
-    # Set color
-    glColor4f(1, 1, 1, 1)
-
-    # Save the current projection matrix
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    glLoadIdentity()
-    glOrtho(0, display_width, 0, display_height, -1, 1)
-
-    # Save the current modelview matrix
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
-    glLoadIdentity()
-
-    # Calculate aspect ratio to maintain proportions
-    overlay_aspect_ratio = tex_width / tex_height
-    display_aspect_ratio = display_width / display_height
-
-    if display_aspect_ratio > overlay_aspect_ratio:
-        new_height = display_height
-        new_width = new_height * overlay_aspect_ratio
-    else:
-        new_width = display_width
-        new_height = new_width / overlay_aspect_ratio
-
-    x_offset = (display_width - new_width) / 2
-    y_offset = (display_height - new_height) / 2
-
-    # Draw the overlay quad with adjusted dimensions
-    glBegin(GL_QUADS)
-    glTexCoord2f(0, 0)
-    glVertex2f(x_offset, y_offset)
-    glTexCoord2f(1, 0)
-    glVertex2f(x_offset + new_width, y_offset)
-    glTexCoord2f(1, 1)
-    glVertex2f(x_offset + new_width, y_offset + new_height)
-    glTexCoord2f(0, 1)
-    glVertex2f(x_offset, y_offset + new_height)
-    glEnd()
-
-    # Restore the original projection and modelview matrices
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
-    glPopMatrix()
-
-    glDisable(GL_TEXTURE_2D)
-    glEnable(GL_LIGHTING)  # Re-enable lighting
+    overlay_texture_data = load_texture("comfyui_worklfows/workflow_highrise.png")
+    print("Dummy Rendered image loaded!")
 
 
 def main():
