@@ -2,7 +2,8 @@
 ## install ComfyUI
 
 1. install [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing)
-2. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
+2. [direct download link here](https://github.com/comfyanonymous/ComfyUI/releases/latest/download/ComfyUI_windows_portable_nvidia.7z)
+3. install manager [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 
 run ComfyUI and in the manager install the following:
 1. install [ComfyUI Essentials](https://github.com/cubiq/ComfyUI_essentials)
@@ -12,6 +13,11 @@ run ComfyUI and in the manager install the following:
 5. install [Canvas Tab](https://github.com/Lerc/canvas_tab)
 
 ## models
+
+https://civitai.com/models/139562/realvisxl-v50
+
+Use Turbo models with DPM++ SDE Karras sampler, 4-10 steps and CFG Scale 1-2.5
+Use Lightning models with DPM++ SDE Karras / DPM++ SDE sampler, 4-6 steps and CFG Scale 1-2
 
 put in ComfyUI/models/checkpoints
 https://huggingface.co/imagepipeline/Copax-TimeLessXL-SDXL1.0/blob/main/copaxTimelessxlSDXL1_v9.safetensors
