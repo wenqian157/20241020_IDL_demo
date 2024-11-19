@@ -6,6 +6,7 @@ from pygame.locals import *
 import time
 import random
 from math import tan, radians
+import os
 
 # Set a seed for reproducibility
 random.seed(42)
@@ -311,12 +312,10 @@ def main():
     set_fullscreen = True
     screen_width, screen_height = 2560, 1600
     display = (int(screen_width * window_scale), int(screen_height * window_scale))
-    # Initialize GLUT
-    # glutInit() #[])
-    # glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    # glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    # glutInitWindowSize(display[0],display[1])
-    # glutCreateWindow(b"Glut Window")
+
+    screenshot_folder = "screenshot"
+    # if not os.path.exists(screenshot_folder):
+    os.makedirs(screenshot_folder, exist_ok=True)
 
     pygame.display.set_caption("GenAI_render")
     if set_fullscreen:
@@ -410,7 +409,10 @@ def main():
 
         # Check if we need to save the screenshot
         if save_screenshot_flag:
-            save_screenshot(display)
+            # add a timestamp to the filename
+            # timestamp = time.strftime("%Y%m%d-%H%M%S")
+            # save_screenshot(display, f"{timestamp}_screenshot.png")            
+            save_screenshot(display, os.path.join(screenshot_folder, "screenshot.png"))
             save_screenshot_flag = False  # Reset the flag
 
         if rendering:
