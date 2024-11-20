@@ -2,7 +2,9 @@ import asyncio
 import os
 import random
 import time
-from math import radians, tan
+
+# from math import radians, tan
+from OpenGL.GL import *
 
 import pygame
 from highrise_funcs import (
@@ -23,7 +25,7 @@ overlay_texture_data = None
 
 async def load_rendered_img_async(img_folder):
     print("Loading the dummy rendered image asynchronously...")
-    await asyncio.sleep(1)  # Wait for 1 second before loading the texture
+    await asyncio.sleep(10)  # Wait for 1 second before loading the texture
     global overlay_texture_data
     overlay_texture_data = load_texture("comfyui_worklfows/workflow_highrise.png")
     print("Dummy Rendered image loaded!")
@@ -59,6 +61,7 @@ def main():
 
     # Main loop
     while running:
+        # screen.fill((0, 0, 0))  # Clear screen each frame
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
