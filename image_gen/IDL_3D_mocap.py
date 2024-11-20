@@ -30,8 +30,8 @@ USE_MOCK_DATA = True
 
 COMFYUI_OUTPUT_FOLDER = "D:\\Anton\\ComfyUI_windows_portable\\ComfyUI\\output"
 
-mocap_x = 640
-mocap_y = 400
+mocap_x = 1280
+mocap_y = 800
 mocap_dist = 10
 left_button_held = False
 save_screenshot_flag = False
@@ -40,17 +40,14 @@ save_screenshot_flag = False
 def map_range(value, old_min, old_max, new_min, new_max):
     return ((value - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
 
-
 def map_point_2_pygame_window(x, y):
     window_size = (1280, 800)
     x = map_range(x, 4, -4, 0, window_size[0])
     y = map_range(y, 5, 0, 0, window_size[1])
     return x, y
 
-
 # Create an event to signal when the thread should stop
 stop_event = threading.Event()
-
 
 def receive():
     global mocap_x, mocap_y, mocap_dist
@@ -65,9 +62,6 @@ def receive():
             mocap_x, mocap_y = values[0], values[1]
             mocap_x, mocap_y = map_point_2_pygame_window(mocap_x, mocap_y)
             mocap_dist = values[2] * 100
-        # display result
-        # update_draw(values)
-
 
 def receive_mock():
     global mocap_x, mocap_y, mocap_dist
@@ -78,23 +72,6 @@ def receive_mock():
         except:
             mocap_x, mocap_y = 640, 400
         mocap_dist = mocap_y / 100
-
-
-# def my_on_click(x, y, button, pressed):
-#     global left_button_held
-#     global overlay_texture_data
-#     global save_screenshot_flag
-#     if pressed:
-#         if button.name == "left":
-#             left_button_held = True
-#             overlay_texture_data = None
-#             print(f"stream = {left_button_held}")
-
-#         elif button.name == "right":
-#             left_button_held = False
-#             save_screenshot_flag = True
-#             print(f"stream = {left_button_held}")
-
 
 async def load_rendered_img_async(img_folder):
     global overlay_texture_data
@@ -145,12 +122,7 @@ def main():
         sock.bind((UDP_IP, UDP_PORT))
         print(f"Listening on {UDP_IP}: {UDP_PORT}...")
         receive_thread = threading.Thread(target=receive)
-        # receice_thread.daemon = True
         receive_thread.start()
-
-    # # set up listener to for mouse click
-    # listener = Listener(on_click=my_on_click)
-    # listener.start()
 
     # Initialize Pygame and create an OpenGL-compatible window
     pygame.init()
