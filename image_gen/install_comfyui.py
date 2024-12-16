@@ -3,6 +3,10 @@ import subprocess
 
 import requests
 
+# Installation folder
+# use two backslashes for windows paths like this D:\\folder\\folder
+INSTALL_FOLDER = "D:\\Anton\\ComfyUI_windows_portable"
+
 
 def download_file(url, dest):
     print(f"Downloading {url}...")
@@ -24,7 +28,7 @@ def create_directory(path):
 
 # Install Manager and Extensions
 def install_manager_and_extensions(install_folder):
-    custom_nodes_folder = os.path.join(install_folder, "ComfyUI/custom_nodes")
+    custom_nodes_folder = os.path.join(install_folder, "ComfyUI", "custom_nodes")
     if not os.path.exists(custom_nodes_folder):
         print(f"Directory does not exist: {custom_nodes_folder}")
         return
@@ -59,7 +63,7 @@ def install_manager_and_extensions(install_folder):
 
 # Download models and put them in the appropriate folders
 def download_models(install_folder):
-    models_folder = os.path.join(install_folder, "ComfyUI/models")
+    models_folder = os.path.join(install_folder, "ComfyUI","models")
     if not os.path.exists(models_folder):
         print(f"Directory does not exist: {models_folder}")
         return
@@ -81,7 +85,9 @@ def download_models(install_folder):
             models_folder, "clip_vision", "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
         ),
         "https://civitai.com/api/download/models/798204?type=Model&format=SafeTensor&size=full&fp=fp16": os.path.join(
-            models_folder, "checkpoints", "realvisxlV50_v50LightningBakedvae.safetensors"
+            models_folder,
+            "checkpoints",
+            "realvisxlV50_v50LightningBakedvae.safetensors",
         ),
     }
     # Download checkpoints
@@ -94,9 +100,7 @@ def download_models(install_folder):
 
 # Run installation functions
 def main():
-    install_folder = (
-        "D:\\Anton\\ComfyUI_windows_portable"
-    )
+    install_folder = INSTALL_FOLDER
     if not os.path.exists(install_folder):
         print(f"Installation folder does not exist: {install_folder}")
         return
