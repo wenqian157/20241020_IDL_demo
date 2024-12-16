@@ -52,7 +52,10 @@ This demo is made for WS3 (Alba) in the IDL.
 1. Install the `portable standalone build` for Windows of [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing). You need 7-zip to unzip it.
 2. Set the `INSTALL_FOLDER` variable in `image_gen\install_compfy.py` to the folder in which your `ComfyUI` folder is located.
 3. Run `python install_compfy.py` to download and install extensions and models. This will take some time.
-4. Test by running
+4. Drag `image_gen/comfyui_worklfows/workflow_highrise.png` to the ComfyUI canvas. This will open the workflow.
+5. set the path in the `LoadImagesFromPath` Node to the `image_gen/screenshot` folder.
+6. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
+7. Test by running
 
 
 
