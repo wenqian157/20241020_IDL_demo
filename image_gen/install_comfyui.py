@@ -5,7 +5,7 @@ import requests
 
 # Installation folder
 # use two backslashes for windows paths like this D:\\folder\\folder
-INSTALL_FOLDER = "D:\\Anton\\ComfyUI_windows_portable"
+INSTALL_FOLDER = "D:\\Demos\\Wen\\ComfyUI_windows_portable"
 
 
 def download_file(url, dest):
