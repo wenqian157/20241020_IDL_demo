@@ -29,7 +29,7 @@ overlay_texture_data = None
 
 USE_MOCK_DATA = False
 
-COMFYUI_OUTPUT_FOLDER = "D:\\Anton\\ComfyUI_windows_portable\\ComfyUI\\output"
+COMFYUI_OUTPUT_FOLDER = "D:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
 
 mocap_x = 1280
 mocap_y = 800
@@ -71,7 +71,7 @@ def receive():
             mocap_dist = values[5] * 20
 
             # update sound
-            send_2_holophonix(values)
+            # send_2_holophonix(values)
 
 def receive_mock():
     global mocap_x, mocap_y, mocap_dist
@@ -140,7 +140,7 @@ async def load_rendered_img_async(img_folder):
 
 def main():
     global mocap_x, mocap_y, mocap_dist
-    use_mock_data = False
+    # use_mock_data = False
     if USE_MOCK_DATA:
         receive_thread = threading.Thread(target=receive_mock)
         receive_thread.start()

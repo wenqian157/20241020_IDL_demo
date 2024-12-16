@@ -52,8 +52,10 @@ This demo is made for WS3 (Alba) in the IDL.
 1. Install the `portable standalone build` for Windows of [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing). You need 7-zip to unzip it.
 2. Set the `INSTALL_FOLDER` variable in `image_gen\install_compfy.py` to the folder in which your `ComfyUI` folder is located.
 3. Run `python install_compfy.py` to download and install extensions and models. This will take some time.
+4. Start ComfyUI by "ComfyUI_windows_portable\run_nvidia_gpu.bat". This will begin initializing the various modules and dependencies and might reach a state "press any key to continue" after which it will simply exit. Then run again as many times as needed until the ComfyUI Canvas opens in the default browser.
+5. In the ComfyUI click on "Manager". Then click on "Custom Nodes Manager". In Filter choose "Installed". Then click on all that have  "Try to update" especially the ones that light up with some errors and have a "Try Fix" button. Restart ComfyUI.
 4. Drag `image_gen/comfyui_worklfows/workflow_highrise.png` to the ComfyUI canvas. This will open the workflow.
-5. set the path in the `LoadImagesFromPath` Node to the `image_gen/screenshot` folder.
+5. set the path in the `LoadImagesFromPath by Mixlabs` Node to the `image_gen/screenshot` folder.
 6. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
 7. Test by running
 
