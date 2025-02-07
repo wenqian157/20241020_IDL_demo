@@ -18,8 +18,11 @@ from highrise_funcs import (
 # Seed for reproducibility if needed
 random.seed(42)
 
+
 # --- HELPER FUNCTIONS FOR ANIMATIONS --- #
-def linear_animation_params(anim_time, start_x, start_y, end_x, end_y, start_size, end_size, duration=1.0):
+def linear_animation_params(
+    anim_time, start_x, start_y, end_x, end_y, start_size, end_size, duration=1.0
+):
     """
     Returns (pos_x, pos_y, size) linearly interpolated over 'duration' seconds,
     looping every time 'anim_time' reaches duration.
@@ -34,7 +37,9 @@ def linear_animation_params(anim_time, start_x, start_y, end_x, end_y, start_siz
     return pos_x, pos_y, size
 
 
-def circular_animation_params(anim_time, center_x, center_y, radius, base_size, size_amplitude):
+def circular_animation_params(
+    anim_time, center_x, center_y, radius, base_size, size_amplitude
+):
     """
     Returns (pos_x, pos_y, size) moving along a circle of 'radius',
     and optionally oscillating the size in a sinusoidal manner.
@@ -73,11 +78,14 @@ def main():
 
     # Animation parameters (adjust these to suit your scene)
     # For linear animation:
-    linear_start = (10, -10)
+    linear_start = (10, 2)
     linear_end = (-10, 45)
     linear_size_start = 4
     linear_size_end = 13
     linear_duration = 3.0
+
+    param_names = ["y", "size", "axes_width"]
+    states = [[2, 4.0, 3.0],[2, 4.0, 3.0]]
 
     # For circular animation:
     circle_center = (0, 0)
@@ -110,10 +118,13 @@ def main():
             # 1) Linear
             pos_x, pos_y, size = linear_animation_params(
                 anim_time,
-                linear_start[0], linear_start[1],
-                linear_end[0], linear_end[1],
-                linear_size_start, linear_size_end,
-                linear_duration
+                linear_start[0],
+                linear_start[1],
+                linear_end[0],
+                linear_end[1],
+                linear_size_start,
+                linear_size_end,
+                linear_duration,
             )
 
             # 2) Circular (uncomment to use instead of linear)
@@ -129,7 +140,9 @@ def main():
             draw_scene(pos_x, pos_y, size, grid_structure)
 
             # Save screenshot with frame index
-            screenshot_path = os.path.join(screenshot_folder, f"screenshot_{frame:03d}.png")
+            screenshot_path = os.path.join(
+                screenshot_folder, f"screenshot_{frame:03d}.png"
+            )
             save_screenshot(display, screenshot_path)
 
             # Update display

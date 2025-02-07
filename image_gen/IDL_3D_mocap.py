@@ -27,7 +27,7 @@ random.seed(42)
 
 overlay_texture_data = None
 
-USE_MOCK_DATA = False
+USE_MOCK_DATA = True
 
 COMFYUI_OUTPUT_FOLDER = "D:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
 
