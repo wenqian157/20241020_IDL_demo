@@ -22,7 +22,7 @@
 7. Then click on Manager and in "Custom Nodes Manager" Filter to "installed". For all that failed click Try Fix. Then click restart. Confirm with OK to reboot the server. Once it reboots, check again if all installed nodes loaded properly. if not repeat this step.
 
 
-# Older notes for refernce
+# Older notes for reference
 
 # refs
 

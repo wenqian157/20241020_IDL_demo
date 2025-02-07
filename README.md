@@ -49,7 +49,7 @@ This demo is made for WS3 (Alba) in the IDL.
 
 ## 2. ComfyUI
 
-1. Install the `portable standalone build` for Windows of [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing). You need 7-zip to unzip it.
+1. Install ComfyUI: install the `portable standalone build` for Windows of [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing). You need 7-zip to unzip it.
 2. Set the `INSTALL_FOLDER` variable in `image_gen\install_compfy.py` to the folder in which your `ComfyUI` folder is located.
 3. Run `python install_compfy.py` to download and install extensions and models. This will take some time.
 4. Start ComfyUI by "ComfyUI_windows_portable\run_nvidia_gpu.bat". This will begin initializing the various modules and dependencies and might reach a state "press any key to continue" after which it will simply exit. Then run again as many times as needed until the ComfyUI Canvas opens in the default browser.
