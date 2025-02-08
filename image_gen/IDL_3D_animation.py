@@ -37,17 +37,7 @@ def linear_animation_params(
     return pos_x, pos_y, size
 
 
-def circular_animation_params(
-    anim_time, center_x, center_y, radius, base_size, size_amplitude
-):
-    """
-    Returns (pos_x, pos_y, size) moving along a circle of 'radius',
-    and optionally oscillating the size in a sinusoidal manner.
-    """
-    pos_x = center_x + radius * math.cos(anim_time)
-    pos_y = center_y + radius * math.sin(anim_time)
-    size = base_size + size_amplitude * math.sin(anim_time)
-    return pos_x, pos_y, size
+
 
 
 def main():
@@ -85,7 +75,7 @@ def main():
     linear_duration = 3.0
 
     param_names = ["y", "size", "axes_width"]
-    states = [[2, 4.0, 3.0],[2, 4.0, 3.0]]
+    states = [[2.0, 4.0, 3.0],[45.0, 13.0, 3.0]]
 
     # For circular animation:
     circle_center = (0, 0)
@@ -127,14 +117,6 @@ def main():
                 linear_duration,
             )
 
-            # 2) Circular (uncomment to use instead of linear)
-            # pos_x, pos_y, size = circular_animation_params(
-            #     anim_time,
-            #     circle_center[0], circle_center[1],
-            #     circle_radius,
-            #     circle_base_size,
-            #     circle_size_amplitude
-            # )
 
             # Draw the scene
             draw_scene(pos_x, pos_y, size, grid_structure)
