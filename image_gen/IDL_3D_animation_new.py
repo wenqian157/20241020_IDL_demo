@@ -80,7 +80,7 @@ def save_screenshot(display_size, filename="frame.png"):
     pixels = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
     surf = pygame.image.fromstring(pixels, (width, height), "RGBA", True)
     # Flip vertical if needed
-    surf = pygame.transform.flip(surf, False, True)
+    surf = pygame.transform.flip(surf, False, False)
     pygame.image.save(surf, filename)
 
 
@@ -177,6 +177,8 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     # Clear
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
+    # Force a white background
+    glClearColor(1.0, 1.0, 1.0, 1.0)
 
     # Decide how many axes we have, to keep total width ~ 45
     target_width = 21.0  # 45.0
@@ -216,6 +218,17 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     adjusted_y = y + size / 2.0
     adjusted_z = building_z_offset + size / 2.0 - 12
 
+    cafe_size = size
+    cafe_height = min(size,10)
+    # The blue cafe box is drawn with center at (0,0,0) after translation+scaling,
+    # so its world extents are:
+    cafe_min_x = adjusted_x - cafe_size/2
+    cafe_max_x = adjusted_x + cafe_size/2
+    cafe_min_y = adjusted_y - cafe_height/2
+    cafe_max_y = adjusted_y + cafe_height/2
+    cafe_min_z = adjusted_z - cafe_size/2
+    cafe_max_z = adjusted_z + cafe_size/2
+
     # Now draw the "blue cafe" box
     glPushMatrix()
     glTranslatef(adjusted_x, adjusted_y, adjusted_z)
@@ -223,6 +236,39 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.3, 0.3, 0.8, 1.0))
     draw_box(1.0)
     glPopMatrix()
+
+    # Now draw the yellow frame around the cafe.
+    frame_d = 0.5
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1.0, 0.8, 0.0, 1.0))
+    
+    # Draw vertical columns at the four corners.
+    for cx in [cafe_min_x, cafe_max_x]:
+        for cz in [cafe_min_z, cafe_max_z]:
+            glPushMatrix()
+            # Place the column so its center is midway vertically.
+            glTranslatef(cx, (cafe_min_y + cafe_max_y) / 2.0, cz)
+            glScalef(frame_d, cafe_height, frame_d)
+            draw_box(1.0)
+            glPopMatrix()
+    
+    # Draw horizontal beams along the x-direction (front and back edges) at top and bottom.
+    for y_level in [cafe_min_y, cafe_max_y]:
+        for z_coord in [cafe_min_z, cafe_max_z]:
+            glPushMatrix()
+            # Center along x is the middle of the cafe box.
+            glTranslatef((cafe_min_x + cafe_max_x) / 2.0, y_level, z_coord)
+            glScalef(cafe_size + frame_d, frame_d, frame_d)
+            draw_box(1.0)
+            glPopMatrix()
+
+    # Draw horizontal beams along the z-direction (left and right edges) at top and bottom.
+    for y_level in [cafe_min_y, cafe_max_y]:
+        for x_coord in [cafe_min_x, cafe_max_x]:
+            glPushMatrix()
+            glTranslatef(x_coord, y_level, (cafe_min_z + cafe_max_z) / 2.0)
+            glScalef(frame_d, frame_d, cafe_size + frame_d)
+            draw_box(1.0)
+            glPopMatrix()
 
 
 def interpolate_keyframes(frame, total_frames, states):
@@ -265,14 +311,17 @@ def interpolate_keyframes(frame, total_frames, states):
 
 def main():
     pygame.init()
-    window_scale = 0.25
+    window_scale = 0.75
     screen_width, screen_height = 2560, 1600
-    display = (int(screen_width * window_scale), int(screen_height * window_scale))
+    disp_w, disp_h = int(screen_width * window_scale), int(screen_height * window_scale)
+    display = (disp_w, disp_h)
     pygame.display.set_caption("GenAI_render_Animation")
 
     screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
     setup_projection_and_lighting()
+    # Force a white background
+    glClearColor(1.0, 1.0, 1.0, 1.0)
 
     # Pre-generate a big grid so we can handle up to e.g. 30 axes
     floors = 12
@@ -292,7 +341,7 @@ def main():
         # left, small cafe, building axes_width=5 => ~45 wide but fewer axes
         [-5.0, 20.0, 5.0, 5.0],
     ]
-    total_frames = 1200
+    total_frames = 600
 
     frame = 0
     clock = pygame.time.Clock()
@@ -308,11 +357,8 @@ def main():
                 running = False
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 running = False
-
-        if frame > total_frames:
-            # loop forever or just exit?
-            # Let's just loop around.
-            frame = 0
+        print(f"Frame {frame:03d} / {total_frames}")
+        
 
         # compute interpolated parameters
         x, y, cafe_size, axes_w = interpolate_keyframes(frame, total_frames, states)
@@ -322,14 +368,20 @@ def main():
 
         # draw
         draw_scene(x, y, cafe_size, axes_w, grid, floors)
-        pygame.display.flip()
+        
 
         # optionally save screenshot
-        # fname = os.path.join(out_dir, f"frame_{frame:03d}.png")
-        # save_screenshot((disp_w, disp_h), fname)
+        fname = os.path.join(out_dir, f"frame_{frame:03d}.png")
+        save_screenshot((disp_w, disp_h), fname)
+
+        pygame.display.flip()
 
         frame += 1
-        # clock.tick(30)  # ~30 fps
+        if frame == total_frames:
+            # loop forever or just exit?
+            running = False
+            # Let's just loop around.
+            # frame = 0
 
     pygame.quit()
 
