@@ -26,6 +26,7 @@ from highrise_funcs import (
 # Utility / drawing code
 # -----------------------------------------------------------
 
+
 def ease_in_out_quad(t: float) -> float:
     """
     Standard easeInOutQuad function.
@@ -42,28 +43,26 @@ def draw_box(size: float):
     half = size / 2.0
     # 8 corners
     verts = [
-        (-half, -half,  half),
-        ( half, -half,  half),
-        ( half,  half,  half),
-        (-half,  half,  half),
+        (-half, -half, half),
+        (half, -half, half),
+        (half, half, half),
+        (-half, half, half),
         (-half, -half, -half),
-        ( half, -half, -half),
-        ( half,  half, -half),
-        (-half,  half, -half),
+        (half, -half, -half),
+        (half, half, -half),
+        (-half, half, -half),
     ]
     # Face indices
     faces = [
-        (0,1,2,3), # front
-        (5,4,7,6), # back
-        (4,0,3,7), # left
-        (1,5,6,2), # right
-        (3,2,6,7), # top
-        (4,5,1,0), # bottom
+        (0, 1, 2, 3),  # front
+        (5, 4, 7, 6),  # back
+        (4, 0, 3, 7),  # left
+        (1, 5, 6, 2),  # right
+        (3, 2, 6, 7),  # top
+        (4, 5, 1, 0),  # bottom
     ]
     # Normals
-    normals = [
-        (0,0,1), (0,0,-1), (-1,0,0), (1,0,0), (0,1,0), (0,-1,0)
-    ]
+    normals = [(0, 0, 1), (0, 0, -1), (-1, 0, 0), (1, 0, 0), (0, 1, 0), (0, -1, 0)]
 
     # Draw
     glBegin(GL_QUADS)
@@ -99,54 +98,6 @@ def generate_grid_structure(floors, max_axes_x, max_axes_z, porosity=0.5):
     ]
 
 
-# def setup_projection_and_lighting(display_width, display_height):
-#     """
-#     Prepare the camera, projection, and lighting. This is an orthographic-ish or frustum setup.
-#     """
-#     glViewport(0, 0, display_width, display_height)
-
-#     # Setup a basic perspective or frustum
-#     glMatrixMode(GL_PROJECTION)
-#     glLoadIdentity()
-
-#     # We define near/far, top/bottom etc. so building is nicely in the view.
-#     near = 0.1
-#     far = 1000.0
-#     camera_distance = 150.0
-#     factor = near / camera_distance
-
-#     # We'll define a symmetrical frustum horizontally,
-#     # but let's keep enough room so that building is visible.
-#     # We'll do about 60 up top, so top=60 -> top * factor
-#     top_val = 60.0 * factor
-#     bottom_val = -60.0 * factor
-#     right_val = 60.0 * factor
-#     left_val = -60.0 * factor
-
-#     glFrustum(left_val, right_val, bottom_val, top_val, near, far)
-
-#     glMatrixMode(GL_MODELVIEW)
-#     glLoadIdentity()
-
-#     # Position the camera
-#     # Eye at (0,20,-camera_distance), looking at (0,20,0)
-#     gluLookAt(
-#         0.0, 20.0, -camera_distance,
-#         0.0, 20.0, 0.0,
-#         0.0, 1.0, 0.0)
-
-#     # Setup lighting
-#     glEnable(GL_LIGHTING)
-#     glEnable(GL_LIGHT0)
-#     glLightfv(GL_LIGHT0, GL_POSITION, (50, 200, 100, 1))
-#     glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1.0))
-#     glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.6, 0.6, 0.6, 1.0))
-#     glLightfv(GL_LIGHT0, GL_SPECULAR, (1.0, 1.0, 1.0, 1.0))
-
-#     # background color
-#     glClearColor(1.0, 1.0, 1.0, 1.0)
-
-
 def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
     """
     Draw the building as a collection of white cubes + frame,
@@ -165,13 +116,13 @@ def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
                 if grid[floor_i][x_i][z_i]:
                     glPushMatrix()
                     # center of that cell
-                    world_x = (x_i * axes_width) - half_w_x + axes_width*0.5
-                    world_y = floor_i * floor_height + floor_height*0.5
-                    world_z = (z_i * axes_width) - half_w_z + axes_width*0.5
+                    world_x = (x_i * axes_width) - half_w_x + axes_width * 0.5
+                    world_y = floor_i * floor_height + floor_height * 0.5
+                    world_z = (z_i * axes_width) - half_w_z + axes_width * 0.5
                     glTranslatef(world_x, world_y, world_z)
                     glScalef(axes_width, floor_height, axes_width)
                     # white color
-                    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1,1,1,1))
+                    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1, 1, 1, 1))
                     draw_box(1.0)
                     glPopMatrix()
 
@@ -181,8 +132,8 @@ def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
     frame_d = 0.5
     building_height = floors * floor_height
 
-    for x_i in range(axes_x+1):
-        for z_i in range(axes_z+1):
+    for x_i in range(axes_x + 1):
+        for z_i in range(axes_z + 1):
             glPushMatrix()
             col_x = (x_i * axes_width) - half_w_x
             col_y = building_height * 0.5
@@ -193,47 +144,52 @@ def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
             glPopMatrix()
 
     # Horizontal beams at each floor
-    for floor_i in range(1, floors+1):
+    for floor_i in range(1, floors + 1):
         y_level = floor_i * floor_height
         # beam in x-direction
-        for z_i in range(axes_z+1):
+        for z_i in range(axes_z + 1):
             glPushMatrix()
             # left edge is -half_w_x, so total width in x is axes_x*axes_width
-            beam_x = -half_w_x + (axes_x*axes_width)/2.0
+            beam_x = -half_w_x + (axes_x * axes_width) / 2.0
             beam_y = y_level
             beam_z = (z_i * axes_width) - half_w_z
             glTranslatef(beam_x, beam_y, beam_z)
-            glScalef(axes_x*axes_width + frame_d, frame_d, frame_d)
+            glScalef(axes_x * axes_width + frame_d, frame_d, frame_d)
             draw_box(1.0)
             glPopMatrix()
 
         # beam in z-direction
-        for x_i in range(axes_x+1):
+        for x_i in range(axes_x + 1):
             glPushMatrix()
             beam_x = (x_i * axes_width) - half_w_x
             beam_y = y_level
-            beam_z = -half_w_z + (axes_z*axes_width)/2.0
+            beam_z = -half_w_z + (axes_z * axes_width) / 2.0
             glTranslatef(beam_x, beam_y, beam_z)
-            glScalef(frame_d, frame_d, axes_z*axes_width + frame_d)
+            glScalef(frame_d, frame_d, axes_z * axes_width + frame_d)
             draw_box(1.0)
             glPopMatrix()
 
 
 def draw_scene(x, y, size, axes_width, grid, floors):
     """
-    Clear screen, then draw building (centered) plus a moving "cafe" box at (x,y,0)
-    The building has total width ~ 45 or so, so we pick axes_x accordingly.
+    Clear screen, then draw building (aligned by closest-to-camera facade) plus a moving "cafe" box at (x,y,0)
     """
     # Clear
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
 
     # Decide how many axes we have, to keep total width ~ 45
-    target_width = 21.0 #45.0
-    # round to at least 1
+    target_width = 21.0  # 45.0
     axes_x = max(1, round(target_width / axes_width))
     axes_z = axes_x  # keep symmetrical
-    # floors is fixed
+
+    # Adjust building position to align its closest-to-camera facade
+    building_x_offset = 0  # Adjust if needed
+    # building_z_offset = -(axes_z - 3.5) * axes_width  # Align closest facade
+    # Choose a constant depth for the building's front facade.
+    desired_front_z = -15.0  # Adjust this value as needed
+    building_z_offset = desired_front_z + (axes_z * axes_width / 2.0)
+
 
     # Draw ground plane
     glPushMatrix()
@@ -244,19 +200,26 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     glNormal3f(0, 1, 0)
     glVertex3f(-plane_size, 0, -plane_size)
     glVertex3f(-plane_size, 0, plane_size)
-    glVertex3f( plane_size, 0, plane_size)
-    glVertex3f( plane_size, 0, -plane_size)
+    glVertex3f(plane_size, 0, plane_size)
+    glVertex3f(plane_size, 0, -plane_size)
     glEnd()
     glPopMatrix()
 
-    # Draw building with given axes_width, axes_x, axes_z
-    draw_building_structure(grid, axes_width, floors, axes_x, axes_z)
-
-    # Now draw the "blue cafe" box using x,y, size.
-    # We'll place it so that z=0 is the building center.
+    # Draw building with given axes_width, axes_x, axes_z, adjusting its position
     glPushMatrix()
-    glTranslatef(x, y, -(axes_z - 3.5) * axes_width)
-    glScalef(size, size, size)
+    glTranslatef(building_x_offset, 0, building_z_offset)
+    draw_building_structure(grid, axes_width, floors, axes_x, axes_z)
+    glPopMatrix()
+
+    # Adjust cafe position to align its left-bottom-closest-to-camera corner
+    adjusted_x = x + size / 2.0
+    adjusted_y = y + size / 2.0
+    adjusted_z = building_z_offset + size / 2.0 - 12
+
+    # Now draw the "blue cafe" box
+    glPushMatrix()
+    glTranslatef(adjusted_x, adjusted_y, adjusted_z)
+    glScalef(size, min(size,10), size)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.3, 0.3, 0.8, 1.0))
     draw_box(1.0)
     glPopMatrix()
@@ -275,12 +238,14 @@ def interpolate_keyframes(frame, total_frames, states):
 
     # local t in [0,1]
     seg_start_frame = seg_i * frames_per_segment
-    seg_end_frame   = seg_start_frame + frames_per_segment
+    seg_end_frame = seg_start_frame + frames_per_segment
     if seg_end_frame > total_frames:
         seg_end_frame = total_frames
     seg_local = float(frame - seg_start_frame) / float(frames_per_segment)
-    if seg_local < 0: seg_local = 0.0
-    if seg_local > 1: seg_local = 1.0
+    if seg_local < 0:
+        seg_local = 0.0
+    if seg_local > 1:
+        seg_local = 1.0
 
     t_eased = ease_in_out_quad(seg_local)
 
@@ -292,7 +257,7 @@ def interpolate_keyframes(frame, total_frames, states):
     for i in range(len(s0)):
         val0 = s0[i]
         val1 = s1[i]
-        val = val0 + (val1 - val0)*t_eased
+        val = val0 + (val1 - val0) * t_eased
         out.append(val)
 
     return out  # [x, y, size, axes_width]
@@ -318,12 +283,16 @@ def main():
     # Let's define our keyframe states: [x, y, size, axes_width]
     # We'll do 4 states, total 600 frames, so 4 segments of 150 frames each.
     states = [
-        [-10.0,  2.0,  4.0,  3.0],  # near left, small cafe, building axes=3 => ~45 wide
-        [ 10.0, 45.0, 13.0,  10],  # further right, bigger cafe, same axes_width=3
-        [  0.0, 30.0,  8.0,  1.5],  # center, medium cafe, building axes_width=1.5 => ~30 wide
-        [ -5.0,  0.0,  2.0,  5.0],  # left, small cafe, building axes_width=5 => ~45 wide but fewer axes
+        # near left, small cafe, building axes=3 => ~45 wide
+        [-13.0, 0.0, 5.0, 3.0],
+        # further right, bigger cafe, same axes_width=3
+        [2.0, 22.0, 12.0, 10.0],
+        # center, medium cafe, building axes_width=1.5 => ~30 wide
+        [-10, 30.0, 20.0, 2],
+        # left, small cafe, building axes_width=5 => ~45 wide but fewer axes
+        [-5.0, 20.0, 5.0, 5.0],
     ]
-    total_frames = 600
+    total_frames = 1200
 
     frame = 0
     clock = pygame.time.Clock()
@@ -347,7 +316,9 @@ def main():
 
         # compute interpolated parameters
         x, y, cafe_size, axes_w = interpolate_keyframes(frame, total_frames, states)
-        print(f"Frame {frame:03d}: x={x:.2f}, y={y:.2f}, size={cafe_size:.2f}, axes_w={axes_w:.2f}")
+        print(
+            f"Frame {frame:03d}: x={x:.2f}, y={y:.2f}, size={cafe_size:.2f}, axes_w={axes_w:.2f}"
+        )
 
         # draw
         draw_scene(x, y, cafe_size, axes_w, grid, floors)
