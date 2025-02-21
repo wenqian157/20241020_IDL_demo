@@ -5,7 +5,7 @@ import requests
 
 # Installation folder
 # use two backslashes for windows paths like this D:\\folder\\folder
-INSTALL_FOLDER = "D:\\Demos\\Wen\\ComfyUI_windows_portable"
+INSTALL_FOLDER = "/Users/antonsavov/_repo"
 
 
 def download_file(url, dest):
@@ -46,6 +46,7 @@ def install_manager_and_extensions(install_folder):
         "https://github.com/palant/image-resize-comfyui",
         "https://github.com/GraftingRayman/ComfyUI_GraftingRayman",
         "https://github.com/ai-shizuka/ComfyUI-tbox",
+        "https://github.com/WASasquatch/was-node-suite-comfyui",
     ]
 
     for repo_url in custom_extensions:
@@ -81,7 +82,7 @@ def download_models(install_folder):
         "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors?download=true": os.path.join(
             models_folder, "ipadapter", "ip-adapter-plus_sdxl_vit-h.safetensors"
         ),
-        "https://huggingface.co/laion/CLIP-ViT-H-14-laion2B-s32B-b79K/resolve/main/open_clip_pytorch_model.safetensors?download=true": os.path.join(
+        "https://huggingface.co/laion/CLIP-ViT-H-14-laion2B-s32B-b79K/resolve/main/open_clip_model.safetensors?download=true": os.path.join(
             models_folder, "clip_vision", "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
         ),
         "https://civitai.com/api/download/models/798204?type=Model&format=SafeTensor&size=full&fp=fp16": os.path.join(

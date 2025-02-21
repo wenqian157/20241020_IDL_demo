@@ -189,8 +189,11 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     building_x_offset = 0  # Adjust if needed
     # building_z_offset = -(axes_z - 3.5) * axes_width  # Align closest facade
     # Choose a constant depth for the building's front facade.
-    desired_front_z = -15.0  # Adjust this value as needed
-    building_z_offset = desired_front_z + (axes_z * axes_width / 2.0)
+    # desired_front_z = -15.0  # Adjust this value as needed
+    # building_z_offset = desired_front_z + (axes_z * axes_width / 2.0)
+    desired_front_z = -15.0
+    building_depth = axes_z * axes_width
+    building_z_offset = desired_front_z + building_depth / 2.0
 
 
     # Draw ground plane
@@ -214,9 +217,17 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     glPopMatrix()
 
     # Adjust cafe position to align its left-bottom-closest-to-camera corner
+    # Decide how far the cafe should protrude from the building
+    cafe_protrusion = 2.0  # how many meters forward from the front face
+    cafe_front_z = desired_front_z - cafe_protrusion
+
     adjusted_x = x + size / 2.0
     adjusted_y = y + size / 2.0
-    adjusted_z = building_z_offset + size / 2.0 - 12
+    # Then later, instead of adjusted_z = building_z_offset + size/2.0 - 12:
+    cafe_min_z = cafe_front_z
+    cafe_center_z = cafe_min_z + (size / 2.0)
+    adjusted_z = cafe_center_z
+    # adjusted_z = building_z_offset + size / 2.0 - 12
 
     cafe_size = size
     cafe_height = min(size,10)
@@ -331,16 +342,28 @@ def main():
 
     # Let's define our keyframe states: [x, y, size, axes_width]
     # We'll do 4 states, total 600 frames, so 4 segments of 150 frames each.
-    states = [
-        # near left, small cafe, building axes=3 => ~45 wide
+    states_v1 = [
+        # near left, small cafe, building axes=3 
         [-13.0, 0.0, 5.0, 3.0],
         # further right, bigger cafe, same axes_width=3
         [2.0, 22.0, 12.0, 10.0],
         # center, medium cafe, building axes_width=1.5 => ~30 wide
         [-10, 30.0, 20.0, 2],
-        # left, small cafe, building axes_width=5 => ~45 wide but fewer axes
+        # left, small cafe, building axes_width=5 
         [-5.0, 20.0, 5.0, 5.0],
     ]
+    states_v2 = [
+        
+        # left, small cafe, building axes_width=5 
+        [0.0, 8.0, 5.0, 5.0],
+        # further right, bigger cafe, same axes_width=3
+        [-13.0, 22.0, 12.0, 10.0],
+        # center, medium cafe, building axes_width=1.5 => ~30 wide
+        [-10, 30.0, 20.0, 2],
+        # near left, small cafe, building axes=3 
+        [8.0, 0.0, 4.0, 3.0],
+    ]
+    states = states_v2
     total_frames = 600
 
     frame = 0

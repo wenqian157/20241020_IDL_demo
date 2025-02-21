@@ -2,10 +2,12 @@
 
 by Wenqian Yang and Anton Savov, 2024
 
+This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/website/) at [Design++, ETH Zurich](https://designplusplus.ethz.ch).
+
 # RUN
 
 Complete the [SETUP](#setup) instructions first.
-To run this demo you need start its separate components:
+To run this demo you need to start its separate components:
 1. Sound,
 2. Motion Capture,
 3. Image Generation and
