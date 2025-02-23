@@ -29,7 +29,8 @@ To run this demo you need to start its separate components:
 2. Drag `image_gen/comfyui_worklfows/workflow_highrise.png` to the ComfyUI canvas. This will open the workflow.
 3. set the path in the `LoadImagesFromPath` Node to the `image_gen/screenshot` folder.
 4. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
-5. ...
+5. Run once to test
+6. Switch to "Queue on change" and leave it open.
 
 ## 4. INTERACTION UI
 1. Open a new Command Prompt and activate the environment:
@@ -60,21 +61,3 @@ This demo is made for WS3 (Alba) in the IDL.
 5. set the path in the `LoadImagesFromPath by Mixlabs` Node to the `image_gen/screenshot` folder.
 6. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
 7. Test by running
-
-
-
-
-## DONT DO, BUT On windows (ONLY IF YOU NEED GLUT)
-
-from: https://stackoverflow.com/questions/65699670/pyopengl-opengl-error-nullfunctionerror-attempt-to-call-an-undefined-functio
-
-
-clone the repository:
-
-git clone https://github.com/mcfletch/pyopengl
-install pyopengl and pyopengl_accelerate:
-
-cd pyopengl
-pip install -e .
-cd accelerate
-pip install -e .
