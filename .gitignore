@@ -242,3 +242,4 @@ crashlytics-build.properties
 .DS_Store
 code/screenshot/screenshot.png
 screenshot/screenshot.png
+image_gen/screenshot/screenshot.png
