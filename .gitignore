@@ -240,3 +240,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 .DS_Store
+code/screenshot/screenshot.png
