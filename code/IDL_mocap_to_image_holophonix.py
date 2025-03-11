@@ -23,8 +23,8 @@ from pythonosc import udp_client
 # ----------------------
 # Configuration
 # ----------------------
-USE_MOCK_POS_DATA = False
-USE_MOCK_IMAGE = False
+USE_MOCK_POS_DATA = True
+USE_MOCK_IMAGE = True
 COMFYUI_OUTPUT_FOLDER = "C:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
 SET_FULLSCREEN = False
 
@@ -32,7 +32,7 @@ SET_FULLSCREEN = False
 # Modes
 # ----------------------
 MODE_INTERACTION = 0  # User can move cafe around
-MODE_RENDER = 1       # Position is frozen, then overlay image is displayed
+MODE_RENDER = 1  # Position is frozen, then overlay image is displayed
 current_mode = MODE_INTERACTION
 
 # ----------------------
@@ -60,6 +60,7 @@ left_button_held = False
 
 # Create an event to signal threads to stop
 stop_event = threading.Event()
+
 
 # ----------------------
 # Mocap + Holophonix
@@ -133,7 +134,9 @@ async def load_rendered_img_async(img_folder):
     if USE_MOCK_IMAGE:
         print("Loading the dummy rendered image asynchronously...")
         await asyncio.sleep(1)
-        overlay_texture_data = load_texture("../image_gen/comfyui_worklfows/workflow_highrise.png")
+        overlay_texture_data = load_texture(
+            "../image_gen/comfyui_worklfows/workflow_highrise.png"
+        )
         print("Dummy Rendered image loaded!")
         return
 
@@ -198,6 +201,9 @@ def main():
     glClearColor(1.0, 1.0, 1.0, 1.0)
 
     floors = 12
+    floor_height = 4.0
+    building_height = floors * floor_height
+    axes_width = 4.0
     max_axes = 30
     grid = generate_grid_structure(
         floors=floors, max_axes_x=max_axes, max_axes_z=max_axes, porosity=0.5
@@ -242,10 +248,13 @@ def main():
             # Read from mocap
             mouse_x, mouse_y = mocap_x, mocap_y
             world_width = 96
-            world_height = 45
+            world_height = 50
 
             # Convert from screen coords to world coords
-            pos_x = ((display[0] - mouse_x) / display[0]) * world_width - (world_width / 2)
+            pos_x = ((display[0] - mouse_x) / display[0]) * world_width - (
+                world_width / 2
+            )
+
             screen_edge_distance = 40
             pos_x = max(
                 screen_edge_distance - world_width / 2,
@@ -253,13 +262,17 @@ def main():
             )
 
             pos_y = ((display[1] - mouse_y) / display[1]) * world_height
-            cafe_size = mocap_dist
+            pos_y = max(0, min(pos_y, building_height-floor_height))
 
+
+            cafe_size = max(axes_width,mocap_dist)
             # Draw the scene with the live café position
-            draw_scene(pos_x, pos_y, cafe_size, 5, grid, floors)
+            draw_scene(pos_x, pos_y, cafe_size, axes_width, grid, floors, floor_height=floor_height)
         else:
             # RENDER mode: freeze at (frozen_x, frozen_y, frozen_size)
-            draw_scene(frozen_x, frozen_y, frozen_size, 5, grid, floors)
+            draw_scene(
+                frozen_x, frozen_y, frozen_size, axes_width, grid, floors, floor_height=floor_height
+            )
 
         # If user requested a screenshot, do so and load the new image
         if save_screenshot_flag:
