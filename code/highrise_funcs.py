@@ -85,52 +85,117 @@ def draw_box(size: float):
     glEnd()
 
 
+def draw_box_with_frame(
+    cx,
+    cy,
+    cz,
+    sx,
+    sy,
+    sz,
+    body_color=(1.0, 1.0, 1.0, 1.0),
+    frame_color=(1.0, 1.0, 1.0, 1.0),
+    frame_thickness=0.5,
+):
+    """
+    Draws a solid box (centered at cx,cy,cz) of size (sx, sy, sz)
+    with a frame around it.
+    """
+    # Compute bounding box corners
+    min_x = cx - sx / 2
+    max_x = cx + sx / 2
+    min_y = cy - sy / 2
+    max_y = cy + sy / 2
+    min_z = cz - sz / 2
+    max_z = cz + sz / 2
+
+    # 1. Draw solid box
+    glPushMatrix()
+    glTranslatef(cx, cy, cz)
+    glScalef(sx, sy, sz)
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, body_color)
+    draw_box(1.0)  # Assumes a draw_box function is defined elsewhere
+    glPopMatrix()
+
+    # 2. Draw frame
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, frame_color)
+
+    # Vertical columns at corners
+    for corner_x in [min_x, max_x]:
+        for corner_z in [min_z, max_z]:
+            glPushMatrix()
+            glTranslatef(corner_x, (min_y + max_y) / 2.0, corner_z)
+            glScalef(frame_thickness, sy, frame_thickness)
+            draw_box(1.0)
+            glPopMatrix()
+
+    # Horizontal beams (x-direction) at top & bottom
+    for y_level in [min_y, max_y]:
+        for z_coord in [min_z, max_z]:
+            glPushMatrix()
+            glTranslatef((min_x + max_x) / 2.0, y_level, z_coord)
+            glScalef(sx + frame_thickness, frame_thickness, frame_thickness)
+            draw_box(1.0)
+            glPopMatrix()
+
+    # Horizontal beams (z-direction) at top & bottom
+    for y_level in [min_y, max_y]:
+        for x_coord in [min_x, max_x]:
+            glPushMatrix()
+            glTranslatef(x_coord, y_level, (min_z + max_z) / 2.0)
+            glScalef(frame_thickness, frame_thickness, sz + frame_thickness)
+            draw_box(1.0)
+            glPopMatrix()
+
+
 def generate_grid_structure(floors=12, max_axes_x=30, max_axes_z=30, porosity=0.5):
     # floors = 12
     # axes_x = 7
     # axes_z = 7
     # Pre-generate the random grid structure for the building
     grid_structure = [
-        [[random.random() < porosity for y in range(max_axes_z)] for x in range(max_axes_x)]
+        [
+            [random.random() < porosity for y in range(max_axes_z)]
+            for x in range(max_axes_x)
+        ]
         for floor in range(floors)
     ]
     return grid_structure
 
 
-def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
+def draw_building_structure(grid, axes_width, floors, axes_x, axes_z, floor_height = 4.0):
     """
-    Draw the building as a collection of white cubes + frame,
+    Draws the building as a collection of white cubes plus a frame,
     centered at x=0, z=0.
     """
-    floor_height = 4.0
+    
 
     # Because building is centered, we offset everything by half the building extents.
     half_w_x = axes_x * axes_width / 2.0
     half_w_z = axes_z * axes_width / 2.0
 
-    # Draw each occupied cell
+    # 1. Draw each occupied cell
     for floor_i in range(floors):
         for x_i in range(axes_x):
             for z_i in range(axes_z):
                 if grid[floor_i][x_i][z_i]:
                     glPushMatrix()
-                    # center of that cell
+                    # Center of that cell
                     world_x = (x_i * axes_width) - half_w_x + axes_width * 0.5
                     world_y = floor_i * floor_height + floor_height * 0.5
                     world_z = (z_i * axes_width) - half_w_z + axes_width * 0.5
                     glTranslatef(world_x, world_y, world_z)
                     glScalef(axes_width, floor_height, axes_width)
-                    # white color
+                    # White color
                     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1, 1, 1, 1))
                     draw_box(1.0)
                     glPopMatrix()
 
-    # Draw the frame (columns/beams)
-    # Columns at each grid intersection
+    # 2. Draw the frame (columns and beams)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1.0, 0.8, 0.0, 1.0))
     frame_d = 0.5
     building_height = floors * floor_height
 
+    # Columns at each grid intersection
     for x_i in range(axes_x + 1):
         for z_i in range(axes_z + 1):
             glPushMatrix()
@@ -145,10 +210,9 @@ def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
     # Horizontal beams at each floor
     for floor_i in range(1, floors + 1):
         y_level = floor_i * floor_height
-        # beam in x-direction
+        # Beams along x-direction
         for z_i in range(axes_z + 1):
             glPushMatrix()
-            # left edge is -half_w_x, so total width in x is axes_x*axes_width
             beam_x = -half_w_x + (axes_x * axes_width) / 2.0
             beam_y = y_level
             beam_z = (z_i * axes_width) - half_w_z
@@ -157,7 +221,7 @@ def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
             draw_box(1.0)
             glPopMatrix()
 
-        # beam in z-direction
+        # Beams along z-direction
         for x_i in range(axes_x + 1):
             glPushMatrix()
             beam_x = (x_i * axes_width) - half_w_x
@@ -169,32 +233,53 @@ def draw_building_structure(grid, axes_width, floors, axes_x, axes_z):
             glPopMatrix()
 
 
-def draw_scene(x, y, size, axes_width, grid, floors):
+def draw_cafe(cx, cy, cz, size):
     """
-    Clear screen, then draw building (aligned by closest-to-camera facade) plus a moving "cafe" box at (x,y,0)
+    Draws the café by calling 'draw_box_with_frame' with typical café dimensions
+    (square footprint = size x size, height = min(size, 10)).
     """
-    # Clear
+    cafe_size = size
+    cafe_height = min(size, 10)
+
+    body_color = (0.3, 0.3, 0.8, 1.0)  # Blue
+    frame_color = (1.0, 0.8, 0.0, 1.0)  # Yellow
+    frame_d = 0.5
+
+    draw_box_with_frame(
+        cx,
+        cy,
+        cz,
+        cafe_size,
+        cafe_height,
+        cafe_size,
+        body_color=body_color,
+        frame_color=frame_color,
+        frame_thickness=frame_d,
+    )
+
+
+def draw_scene(x, y, size, axes_width, grid, floors, floor_height = 4.0):
+    """
+    Clears screen, sets up camera, draws ground plane,
+    then draws the building plus a moving 'café' box.
+    """
+    # 1. Clear/initialize
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
-    # Force a white background
     glClearColor(1.0, 1.0, 1.0, 1.0)
 
-    # Decide how many axes we have, to keep total width ~ 45
-    target_width = 21.0  # 45.0
+    # 2. Decide how many axes in building to keep total width ~21
+    target_width = 21.0
     axes_x = max(1, round(target_width / axes_width))
     axes_z = axes_x  # keep symmetrical
 
-    # Adjust building position to align its closest-to-camera facade
-    building_x_offset = 0  # Adjust if needed
-    # building_z_offset = -(axes_z - 3.5) * axes_width  # Align closest facade
-    # Choose a constant depth for the building's front facade.
-    # desired_front_z = -15.0  # Adjust this value as needed
-    # building_z_offset = desired_front_z + (axes_z * axes_width / 2.0)
+    # 3. Compute building offsets
     desired_front_z = -15.0
     building_depth = axes_z * axes_width
     building_z_offset = desired_front_z + building_depth / 2.0
+    building_x_offset = 0.0
 
-    # Draw ground plane
+    # 4. Draw ground plane
     glPushMatrix()
     glTranslatef(0, -1, 0)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.95, 0.95, 0.95, 1.0))
@@ -208,202 +293,23 @@ def draw_scene(x, y, size, axes_width, grid, floors):
     glEnd()
     glPopMatrix()
 
-    # Draw building with given axes_width, axes_x, axes_z, adjusting its position
+    # 5. Draw building
     glPushMatrix()
     glTranslatef(building_x_offset, 0, building_z_offset)
     draw_building_structure(grid, axes_width, floors, axes_x, axes_z)
     glPopMatrix()
 
-    # Adjust cafe position to align its left-bottom-closest-to-camera corner
-    # Decide how far the cafe should protrude from the building
-    cafe_protrusion = 2.0  # how many meters forward from the front face
+    # 6. Compute café position (just an example offset relative to building)
+    cafe_protrusion = 2.0
     cafe_front_z = desired_front_z - cafe_protrusion
+    # Shift x, y so the café's lower-left corner is at (x,y)
+    adjusted_cx = x + size / 2.0
+    adjusted_cy = y + size / 2.0
+    # Front face goes at cafe_front_z, so center is half 'size' behind that
+    adjusted_cz = cafe_front_z + size / 2.0
 
-    adjusted_x = x + size / 2.0
-    adjusted_y = y + size / 2.0
-    # Then later, instead of adjusted_z = building_z_offset + size/2.0 - 12:
-    cafe_min_z = cafe_front_z
-    cafe_center_z = cafe_min_z + (size / 2.0)
-    adjusted_z = cafe_center_z
-    # adjusted_z = building_z_offset + size / 2.0 - 12
-
-    cafe_size = size
-    cafe_height = min(size, 10)
-    # The blue cafe box is drawn with center at (0,0,0) after translation+scaling,
-    # so its world extents are:
-    cafe_min_x = adjusted_x - cafe_size / 2
-    cafe_max_x = adjusted_x + cafe_size / 2
-    cafe_min_y = adjusted_y - cafe_height / 2
-    cafe_max_y = adjusted_y + cafe_height / 2
-    cafe_min_z = adjusted_z - cafe_size / 2
-    cafe_max_z = adjusted_z + cafe_size / 2
-
-    # Now draw the "blue cafe" box
-    glPushMatrix()
-    glTranslatef(adjusted_x, adjusted_y, adjusted_z)
-    glScalef(size, min(size, 10), size)
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.3, 0.3, 0.8, 1.0))
-    draw_box(1.0)
-    glPopMatrix()
-
-    # Now draw the yellow frame around the cafe.
-    frame_d = 0.5
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1.0, 0.8, 0.0, 1.0))
-
-    # Draw vertical columns at the four corners.
-    for cx in [cafe_min_x, cafe_max_x]:
-        for cz in [cafe_min_z, cafe_max_z]:
-            glPushMatrix()
-            # Place the column so its center is midway vertically.
-            glTranslatef(cx, (cafe_min_y + cafe_max_y) / 2.0, cz)
-            glScalef(frame_d, cafe_height, frame_d)
-            draw_box(1.0)
-            glPopMatrix()
-
-    # Draw horizontal beams along the x-direction (front and back edges) at top and bottom.
-    for y_level in [cafe_min_y, cafe_max_y]:
-        for z_coord in [cafe_min_z, cafe_max_z]:
-            glPushMatrix()
-            # Center along x is the middle of the cafe box.
-            glTranslatef((cafe_min_x + cafe_max_x) / 2.0, y_level, z_coord)
-            glScalef(cafe_size + frame_d, frame_d, frame_d)
-            draw_box(1.0)
-            glPopMatrix()
-
-    # Draw horizontal beams along the z-direction (left and right edges) at top and bottom.
-    for y_level in [cafe_min_y, cafe_max_y]:
-        for x_coord in [cafe_min_x, cafe_max_x]:
-            glPushMatrix()
-            glTranslatef(x_coord, y_level, (cafe_min_z + cafe_max_z) / 2.0)
-            glScalef(frame_d, frame_d, cafe_size + frame_d)
-            draw_box(1.0)
-            glPopMatrix()
-
-
-def draw_scene_old(pos_x, pos_y, distance, grid_structure):
-    # print(grid_structure)
-    # Clear the screen and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glEnable(GL_DEPTH_TEST)
-    glClearColor(1.0, 1.0, 1.0, 1.0)  # Set background color to white
-
-    # Draw the ground as a plane extending to the horizon
-    glPushMatrix()
-    glTranslatef(0, -1, 0)  # Lower the plane slightly below the boxes
-    glMaterialfv(
-        GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.95, 0.95, 0.95, 1)
-    )  # Set color for the base
-    glBegin(GL_QUADS)
-    glNormal3f(0.0, 1.0, 0.0)  # Normal pointing up
-    plane_size = 10000
-    glVertex3f(-plane_size, 0.0, -plane_size)  # Bottom left corner
-    glVertex3f(-plane_size, 0.0, plane_size)  # Top left corner
-    glVertex3f(plane_size, 0.0, plane_size)  # Top right corner
-    glVertex3f(plane_size, 0.0, -plane_size)  # Bottom right corner
-    glEnd()
-    glPopMatrix()
-
-    floors = len(grid_structure)
-    axes_x = len(grid_structure[0])
-    axes_z = len(grid_structure[0][0])
-
-    axes_width = 3
-    floor_height = 4
-
-    building_height = floors * floor_height
-
-    # Draw the building as a grid of cubes
-    for floor in range(len(grid_structure)):
-        for x in range(len(grid_structure[0])):
-            for z in range(len(grid_structure[0][0])):
-                if grid_structure[floor][x][z]:
-                    glPushMatrix()
-                    cube_x = pos_x + (x - axes_x / 2) * axes_width
-                    cube_y = (floor * floor_height) + (floor_height / 2)
-                    cube_z = (z - axes_z / 2) * axes_width
-                    glTranslatef(cube_x, cube_y, cube_z)
-                    glScalef(axes_width, floor_height, axes_width)
-                    # Set color for the building
-                    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1, 1, 1, 1))
-                    # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
-                    draw_box(1)
-                    glPopMatrix()
-
-    # Draw the frame (beams and columns)
-    # Set color for the frame
-    # glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.2, 0.2, 0.2, 1))
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (1, 0.8, 0.0, 1))
-    frame_d = 0.5
-    for x in range(axes_x + 1):
-        for z in range(axes_z + 1):
-            # Draw vertical columns
-            glPushMatrix()
-            column_x = pos_x + (x - axes_x / 2) * axes_width - axes_width / 2
-            column_y = building_height / 2
-            column_z = (z - axes_z / 2) * axes_width - axes_width / 2
-            # Translate to the desired position
-            glTranslatef(column_x, column_y, column_z)
-            # Scale to the desired dimensions
-            glScalef(frame_d, building_height, frame_d)
-            # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
-            draw_box(1)
-            glPopMatrix()
-
-    # Draw horizontal beams at each floor level
-    for floor in range(1, floors + 1):
-        for z in range(axes_z + 1):
-            glPushMatrix()
-            beam_x = pos_x - axes_width / 2
-            beam_y = floor * floor_height
-            beam_z = (z - axes_z / 2) * axes_width - axes_width / 2
-            # Translate to the desired position
-            glTranslatef(beam_x, beam_y, beam_z)
-            # Scale to the desired dimensions
-            glScalef(axes_x * axes_width + frame_d, frame_d, frame_d)
-            # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
-            draw_box(1)
-            glPopMatrix()
-        for x in range(axes_x + 1):
-            glPushMatrix()
-            beam_x = pos_x + (x - axes_x / 2) * axes_width - axes_width / 2
-            beam_y = floor * floor_height
-            beam_z = -axes_width / 2
-            # Translate to the desired position
-            glTranslatef(beam_x, beam_y, beam_z)
-            # Scale to the desired dimensions
-            glScalef(frame_d, frame_d, axes_z * axes_width + frame_d)
-            # glutSolidCube(1)
-            draw_box(1)
-            glPopMatrix()
-
-    # Draw the second box the cafe
-    threshold = 10
-    cafe_y = max(0, min(pos_y, (floors - 1) * floor_height))
-
-    # Set cafe height in number of floors (1 or 2)
-    cafe_floors = 2 if distance > threshold else 1
-    if cafe_floors == 2:
-        cafe_y = (cafe_y // floor_height) * floor_height  # Align to full floor height
-    else:
-        cafe_y = (
-            floor_height / 2 + (cafe_y // floor_height) * floor_height
-        )  # Align to half floor height
-
-    # Create the Cafe
-    cafe_height = cafe_floors * 4
-    # Restrict cafe width to a maximum value and ensure it is not smaller than axes_width
-    max_cafe_width = 4.5 * axes_width
-    cafe_width = max(axes_width, min(distance, max_cafe_width))
-    glPushMatrix()
-    # Translate to the desired position
-    glTranslatef(pos_x + 1 * axes_width, cafe_y, -(axes_z - 3.5) * axes_width)
-    # Scale to the desired dimensions
-    glScalef(cafe_width, cafe_height, axes_width * 2.5)
-    # Set color for the cafe
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (0.3, 0.3, 0.8, 1))
-    # glutSolidCube(1)  # Draw a unit cube scaled to the desired size
-    draw_box(1)
-    glPopMatrix()
+    # 7. Draw café
+    draw_cafe(adjusted_cx, adjusted_cy, adjusted_cz, size)
 
 
 def save_screenshot(display, filename="dummy_screenshot.png"):
