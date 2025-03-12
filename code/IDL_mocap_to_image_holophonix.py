@@ -23,7 +23,7 @@ from pythonosc import udp_client
 # ----------------------
 # Configuration
 # ----------------------
-USE_MOCK_POS_DATA = True
+USE_MOCK_POS_DATA = False
 USE_MOCK_IMAGE = True
 COMFYUI_OUTPUT_FOLDER = "C:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
 SET_FULLSCREEN = False
@@ -61,6 +61,8 @@ left_button_held = False
 # Create an event to signal threads to stop
 stop_event = threading.Event()
 
+# holophonix client
+holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
 
 # ----------------------
 # Mocap + Holophonix
@@ -73,7 +75,7 @@ def receive_new_pos(rigid_body_list):
     if start.id_num > end.id_num:
         start, end = end, start
 
-    broadcast_rigid_body(rigid_body_list)
+    # broadcast_rigid_body(rigid_body_list)
 
     pt_on_screen, pt_on_dome, rigidbody_dist = idl.process_tracked_poses(start, end)
     if (pt_on_screen is None) or (pt_on_dome is None) or (rigidbody_dist is None):
@@ -104,18 +106,18 @@ def broadcast_rigid_body(rigid_body_list):
 
 def send_2_holophonix(x, y, z, reverb):
     """Example function that updates a Holophonix client based on user input."""
-    global left_button_held
+    global current_mode
 
     x, y, z = idl.map_point_2_holophonix(x, y, z)
     reverb_mapped = idl.map_range(reverb, 0, 1, 0, 15)
     holophonix_client.send_message("/reverb/2/tr0", reverb_mapped)
-
-    if left_button_held:
+    if current_mode == MODE_RENDER:
+        holophonix_client.send_message("/track/1/xyz", (0.1, 0.1, 0.1))
+        holophonix_client.send_message("/track/1/gain", 6) 
+    else:
         holophonix_client.send_message("/track/1/xyz", (x, y, z))
         holophonix_client.send_message("/track/1/gain", 12)
-    else:
-        holophonix_client.send_message("/track/1/xyz", (0.1, 0.1, 0.1))
-        holophonix_client.send_message("/track/1/gain", 6)
+        
 
 
 def send_2_pygame(w, h, room_size):
@@ -169,7 +171,7 @@ def main():
     global current_mode
     global pos_x, pos_y, cafe_size
     global frozen_x, frozen_y, frozen_size
-    global overlay_texture_data, save_screenshot_flag, left_button_held
+    global overlay_texture_data, save_screenshot_flag
 
     random.seed(42)
     streaming_client = None
@@ -182,7 +184,7 @@ def main():
     else:
         streaming_client = NatNetClient()
         streaming_client.pos_listener = receive_new_pos
-        streaming_client.set_print_level(30)
+        streaming_client.set_print_level(10)
         streaming_client.run()
 
     # Pygame init
@@ -233,15 +235,12 @@ def main():
 
                     # Trigger screenshot -> new image load
                     save_screenshot_flag = True
+                    print("render")
                 else:
                     # Switch back to interaction mode
                     current_mode = MODE_INTERACTION
                     overlay_texture_data = None
-
-                left_button_held = True
-
-            elif event.type == MOUSEBUTTONUP and event.button == 1:
-                left_button_held = False
+                    print("interact")
 
         # Update / Draw based on the current mode
         if current_mode == MODE_INTERACTION:
@@ -296,6 +295,4 @@ def main():
 
 
 if __name__ == "__main__":
-    stop_event = threading.Event()
-    holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
     main()
