@@ -24,7 +24,7 @@ from pythonosc import udp_client
 # Configuration
 # ----------------------
 USE_MOCK_POS_DATA = False
-USE_MOCK_IMAGE = True
+USE_MOCK_IMAGE = False
 COMFYUI_OUTPUT_FOLDER = "C:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
 SET_FULLSCREEN = False
 
@@ -75,7 +75,7 @@ def receive_new_pos(rigid_body_list):
     if start.id_num > end.id_num:
         start, end = end, start
 
-    # broadcast_rigid_body(rigid_body_list)
+    #broadcast_rigid_body(rigid_body_list)
 
     pt_on_screen, pt_on_dome, rigidbody_dist = idl.process_tracked_poses(start, end)
     if (pt_on_screen is None) or (pt_on_dome is None) or (rigidbody_dist is None):
@@ -144,9 +144,9 @@ async def load_rendered_img_async(img_folder):
 
     print("Loading the rendered image asynchronously...")
     start_time = time.time()
-
+    time_elapsed = 0
     # Wait until a new PNG file is found in the folder with a modification time after start_time
-    while True:
+    while time_elapsed < 30:
         await asyncio.sleep(0.1)
         for file_name in os.listdir(img_folder):
             file_path = os.path.join(img_folder, file_name)
@@ -162,6 +162,9 @@ async def load_rendered_img_async(img_folder):
                         except FileNotFoundError as e:
                             print(f"Attempt {attempt + 1} failed: {e}. Retrying...")
                             await asyncio.sleep(0.5)
+        time_elapsed = time.time() - start_time
+        print(time_elapsed)
+    print("loading image failed")
 
 
 # ----------------------
@@ -268,10 +271,15 @@ def main():
             # Draw the scene with the live café position
             draw_scene(pos_x, pos_y, cafe_size, axes_width, grid, floors, floor_height=floor_height)
         else:
-            # RENDER mode: freeze at (frozen_x, frozen_y, frozen_size)
-            draw_scene(
-                frozen_x, frozen_y, frozen_size, axes_width, grid, floors, floor_height=floor_height
-            )
+            # If an overlay texture is available, draw it now
+            if overlay_texture_data is not None:
+                texture_id, tex_width, tex_height = overlay_texture_data
+                draw_overlay(texture_id, tex_width, tex_height, display)
+            else:
+                # RENDER mode: freeze at (frozen_x, frozen_y, frozen_size)
+                draw_scene(
+                    frozen_x, frozen_y, frozen_size, axes_width, grid, floors, floor_height=floor_height
+                )
 
         # If user requested a screenshot, do so and load the new image
         if save_screenshot_flag:
@@ -279,10 +287,7 @@ def main():
             save_screenshot(display, os.path.join(screenshot_folder, "screenshot.png"))
             asyncio.run(load_rendered_img_async(COMFYUI_OUTPUT_FOLDER))
 
-        # If an overlay texture is available, draw it now
-        if overlay_texture_data is not None:
-            texture_id, tex_width, tex_height = overlay_texture_data
-            draw_overlay(texture_id, tex_width, tex_height, display)
+        
 
         pygame.display.flip()
 
