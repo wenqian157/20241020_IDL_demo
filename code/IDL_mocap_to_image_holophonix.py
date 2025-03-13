@@ -26,7 +26,7 @@ from pythonosc import udp_client
 USE_MOCK_POS_DATA = False
 USE_MOCK_IMAGE = False
 COMFYUI_OUTPUT_FOLDER = "C:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
-SET_FULLSCREEN = False
+SET_FULLSCREEN = True
 
 # ----------------------
 # Modes

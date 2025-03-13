@@ -303,8 +303,8 @@ def draw_scene(x, y, size, axes_width, grid, floors, floor_height = 4.0):
     cafe_protrusion = 2.0
     cafe_front_z = desired_front_z - cafe_protrusion
     # Shift x, y so the café's lower-left corner is at (x,y)
-    adjusted_cx = x + size / 2.0
-    adjusted_cy = y + size / 2.0
+    adjusted_cx = x #+ size / 2.0
+    adjusted_cy = y #+ size / 2.0
     # Front face goes at cafe_front_z, so center is half 'size' behind that
     adjusted_cz = cafe_front_z + size / 2.0
 
