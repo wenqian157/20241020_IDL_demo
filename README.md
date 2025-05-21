@@ -16,28 +16,34 @@ To run this demo you need to start its separate components:
 
 
 ## 1. SOUND
-1. open `filename.ext` in Reaper
-2. select sound output `XXX`
-3. loop play
+1. open `sounds/demo_reaper.rpp` in Reaper
+2. select sound output `DAW Out Multiout channel`
+3. open holophonix server in the browser 10.255.255.60
+4. loop play
 
 ## 2. MOCAP
 1. Open `Motive`
-2. 
+2. Set to Loopback in the streaming pane.
+3. In the Assets Pane make sure GTR and VOC are checked. Those are the tracked markers
 
 ## 3. IMAGE GENERATION
-1. Start ComfyUI 
+1. Start ComfyUI from the run_nvdia_gpu.bat file
 2. Drag `image_gen/comfyui_worklfows/workflow_highrise.png` to the ComfyUI canvas. This will open the workflow.
 3. set the path in the `LoadImagesFromPath` Node to the `image_gen/screenshot` folder.
 4. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
-5. Run once to test
-6. Switch to "Queue on change" and leave it open.
+5. Switch to "Queue on change", press play and leave it open.
 
 ## 4. INTERACTION UI
-1. Open a new Command Prompt and activate the environment:
+1. Open a new Anaconda Command Prompt and activate the environment:
     
         conda activate idldemo
-2. cd to `image_gen` folder
-3. run `python IDL_3D_mocap.py`
+2. cd to `code` folder in the demo git repo
+3. run `python IDL_mocap_to_image_holophonix.py`
+
+## 5. PLAY
+1. Pretend your are holding a bow and pointing an arrow. GTR tracker is the tip of the arrow, VOC is the back.
+2. You control the postion of the blue box with where the tip is pointed at and its size by how much you "pull the bow", i.e. distance between markers.
+3. Once you like a location press the mouse button to generate the image. Press again to enable interaction again.
 
 
 # SETUP
