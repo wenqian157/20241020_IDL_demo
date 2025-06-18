@@ -1,10 +1,22 @@
-# IDL Demo
+# The IDL Highrise Demo
+## Immersive Interactive Design with Generative AI
 
-by Wenqian Yang and Anton Savov, 2024
+This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/website/) at [Design++, ETH Zurich](https://designplusplus.ethz.ch). It enables visitors to interactively position and scale a café within a residential high-rise, simulating both visual appearance and acoustic characteristics. Using the OptiTrack motion capture system, visitors control the café's size and placement, while a 72-speaker spatial audio system dynamically adjusts reverberation effects. Real-time visuals are rendered via generative AI (Stable Diffusion, ControlNET, and ComfyUI) running on a GPU workstation, providing instant, realistic feedback without the need for detailed 3D models.
 
-This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/website/) at [Design++, ETH Zurich](https://designplusplus.ethz.ch).
+![IDL setup and workflow](img/idl-diagram.jpg)  
+*Figure 1: Setup and workflow in the Immersive Design Lab (IDL)*
 
-# RUN
+![Interaction close-up](img/interaction-close-up.jpg)  
+*Figure 2: User adjusts the “blue box café” via OptiTrack*
+
+![AI-rendered semi-frame](img/AI-render-semi-frame.jpg)  
+*Figure 3: From schematic tower model to gen-AI render*
+
+---
+
+by Wenqian Yang and Anton Savov, 2025
+
+## RUN
 
 Complete the [SETUP](#setup) instructions first.
 To run this demo you need to start its separate components:
@@ -15,48 +27,48 @@ To run this demo you need to start its separate components:
 
 
 
-## 1. SOUND
+### 1. SOUND
 1. open `sounds/demo_reaper.rpp` in Reaper
 2. select sound output `DAW Out Multiout channel`
 3. open holophonix server in the browser 10.255.255.60
 4. loop play
 
-## 2. MOCAP
+### 2. MOCAP
 1. Open `Motive`
 2. Set to Loopback in the streaming pane.
 3. In the Assets Pane make sure GTR and VOC are checked. Those are the tracked markers
 
-## 3. IMAGE GENERATION
+### 3. IMAGE GENERATION
 1. Start ComfyUI from the run_nvdia_gpu.bat file
 2. Drag `image_gen/comfyui_worklfows/workflow_highrise.png` to the ComfyUI canvas. This will open the workflow.
 3. set the path in the `LoadImagesFromPath` Node to the `image_gen/screenshot` folder.
 4. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
 5. Switch to "Queue on change", press play and leave it open.
 
-## 4. INTERACTION UI
+### 4. INTERACTION UI
 1. Open a new Anaconda Command Prompt and activate the environment:
     
         conda activate idldemo
 2. cd to `code` folder in the demo git repo
 3. run `python IDL_mocap_to_image_holophonix.py`
 
-## 5. PLAY
+### 5. PLAY
 1. Pretend your are holding a bow and pointing an arrow. GTR tracker is the tip of the arrow, VOC is the back.
 2. You control the postion of the blue box with where the tip is pointed at and its size by how much you "pull the bow", i.e. distance between markers.
 3. Once you like a location press the mouse button to generate the image. Press again to enable interaction again.
 
 
-# SETUP
+## SETUP
 
 This demo is made for WS3 (Alba) in the IDL.
 
-## 1. Conda environment
+### 1. Conda environment
 
     conda create -n idldemo python=3.13.0
     conda activate idldemo
     pip install -r requirements.txt
 
-## 2. ComfyUI
+### 2. ComfyUI
 
 1. Install ComfyUI: install the `portable standalone build` for Windows of [ComfyUI](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing). You need 7-zip to unzip it.
 2. Set the `INSTALL_FOLDER` variable in `image_gen\install_compfy.py` to the folder in which your `ComfyUI` folder is located.
