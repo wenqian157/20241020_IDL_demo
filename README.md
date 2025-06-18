@@ -1,16 +1,17 @@
 # The IDL Highrise Demo
 ## Immersive Interactive Design with Generative AI
 
+![AI-rendered semi-frame](img/AI-render-semi-frame.jpg)  
+*Figure 1: From interactive schematic tower model to gen-AI render*
+
 This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/website/) at [Design++, ETH Zurich](https://designplusplus.ethz.ch). It enables visitors to interactively position and scale a café within a residential high-rise, simulating both visual appearance and acoustic characteristics. Using the OptiTrack motion capture system, visitors control the café's size and placement, while a 72-speaker spatial audio system dynamically adjusts reverberation effects. Real-time visuals are rendered via generative AI (Stable Diffusion, ControlNET, and ComfyUI) running on a GPU workstation, providing instant, realistic feedback without the need for detailed 3D models.
 
-![IDL setup and workflow](img/idl-diagram.jpg)  
-*Figure 1: Setup and workflow in the Immersive Design Lab (IDL)*
 
 ![Interaction close-up](img/interaction-close-up.jpg)  
 *Figure 2: User adjusts the “blue box café” via OptiTrack*
 
-![AI-rendered semi-frame](img/AI-render-semi-frame.jpg)  
-*Figure 3: From schematic tower model to gen-AI render*
+![IDL setup and workflow](img/idl-diagram.jpg)  
+*Figure 2: Setup and workflow in the Immersive Design Lab (IDL)*
 
 ---
 
