@@ -11,7 +11,7 @@ This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/
 *Figure 2: User adjusts the “blue box café” via OptiTrack*
 
 ![IDL setup and workflow](img/idl-diagram.jpg)  
-*Figure 2: Setup and workflow in the Immersive Design Lab (IDL)*
+*Figure 3: Setup and workflow in the Immersive Design Lab (IDL)*
 
 ---
 
