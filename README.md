@@ -4,6 +4,15 @@
 ![AI-rendered semi-frame](img/AI-render-semi-frame.jpg)  
 *Figure 1: From interactive schematic tower model to gen-AI render*
 
+
+
+**Watch the video on YouTube**
+
+[![Watch the video](https://img.youtube.com/vi/UhrEyFN_NZM/0.jpg)](https://www.youtube.com/watch?v=UhrEyFN_NZM)
+
+[![Watch on YouTube](https://img.shields.io/badge/YouTube-Play-red?style=for-the-badge&logo=youtube)](https://youtu.be/UhrEyFN_NZM)
+
+
 This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/website/) at [Design++, ETH Zurich](https://designplusplus.ethz.ch). It enables visitors to interactively position and scale a café within a residential high-rise, simulating both visual appearance and acoustic characteristics. Using the OptiTrack motion capture system, visitors control the café's size and placement, while a 72-speaker spatial audio system dynamically adjusts reverberation effects. Real-time visuals are rendered via generative AI (Stable Diffusion, ControlNET, and ComfyUI) running on a GPU workstation, providing instant, realistic feedback without the need for detailed 3D models.
 
 
