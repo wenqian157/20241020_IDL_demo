@@ -24,7 +24,6 @@ This demo is developed for the [Immersive Design Lab (IDL)](https://idl.ethz.ch/
 
 ---
 
-by Wenqian Yang and Anton Savov, 2025
 
 ## RUN
 
@@ -89,3 +88,11 @@ This demo is made for WS3 (Alba) in the IDL.
 5. set the path in the `LoadImagesFromPath by Mixlabs` Node to the `image_gen/screenshot` folder.
 6. set the styling image in the `LoadImage` node below the `LoadImagesFromPath` node to the `image_gen/workflows/styling_reference_01.png`
 7. Test by running
+
+---
+
+Project by Wenqian Yang and Anton Savov, 2025  
+
+<img src="img/design++_S_RGB.png" alt="Design++ Logo" height="50">
+
+---
