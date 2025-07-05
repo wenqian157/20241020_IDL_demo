@@ -81,7 +81,11 @@ def receive_new_pos(rigid_body_list):
     if (pt_on_screen is None) or (pt_on_dome is None) or (rigidbody_dist is None):
         return
 
-    send_2_holophonix(pt_on_dome[0], pt_on_dome[1], pt_on_dome[2], rigidbody_dist)
+    #old sound effect
+    # send_2_holophonix(pt_on_dome[0], pt_on_dome[1], pt_on_dome[2], rigidbody_dist)
+     
+    # new sound effect
+    send_2_holophonix_new(rigidbody_dist) 
     send_2_pygame(pt_on_screen[0], pt_on_screen[1], rigidbody_dist)
 
 
@@ -118,7 +122,15 @@ def send_2_holophonix(x, y, z, reverb):
         holophonix_client.send_message("/track/1/xyz", (x, y, z))
         holophonix_client.send_message("/track/1/gain", 12)
         
+def send_2_holophonix_new(reverb):
+    global current_mode
+    if current_mode == MODE_INTERACTION:
+        reverb_mapped = idl.map_range(reverb, 0, 1, 0, 15)
+        holophonix_client.send_message("/reverb/2/tr0", reverb_mapped)
 
+    # below two lines can be removed if the default setting in holophonix is set properly 
+    holophonix_client.send_message("/track/1/xyz", (0.1, 0.1, 0.1))  # location of sound
+    holophonix_client.send_message("/track/1/gain", 6) # volume of sound
 
 def send_2_pygame(w, h, room_size):
     """Updates global mocap_x/mocap_y from w,h. Adjusts distance."""
