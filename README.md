@@ -44,7 +44,7 @@ To run this demo you need to start its separate components:
 
 ### 2. MOCAP
 1. Open `Motive`
-2. Set to Loopback in the streaming pane.
+2. Set to Loopback in the streaming pane. In Motive 3.x, Streaming is found the Settings.
 3. In the Assets Pane make sure GTR and VOC are checked. Those are the tracked markers
 
 ### 3. IMAGE GENERATION
