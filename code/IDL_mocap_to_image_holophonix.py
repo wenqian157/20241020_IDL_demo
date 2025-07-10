@@ -168,7 +168,7 @@ def send_2_holophonix(x, y, z, reverb):
 def send_2_holophonix_new(reverb):
     # global current_mode
     # if current_mode == MODE_INTERACTION:
-    reverb_mapped = idl.map_range(reverb, 0, 1, 0, 20)
+    reverb_mapped = idl.map_range(reverb, 0, 1, 1, 20)
     # gain_mapped = idl.map_range(reverb, 0, 1, 2, 15)
     holophonix_client.send_message("/reverb/2/tr0", reverb_mapped)
 
