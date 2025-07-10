@@ -66,7 +66,50 @@ holophonix_client = udp_client.SimpleUDPClient("10.255.255.60", 4003)
 
 # ----------------------
 # Mocap + Holophonix
-# ----------------------
+
+
+# def receive_new_frame(data_dict):
+#     order_list = ["frameNumber", "markerSetCount", "unlabeledMarkersCount", #type: ignore  # noqa F841
+#                   "rigidBodyCount", "skeletonCount", "labeledMarkerCount",
+#                   "timecode", "timecodeSub", "timestamp", "isRecording",
+#                   "trackedModelsChanged"]
+#     dump_args = True
+#     if dump_args is True:
+#         out_string = "    "
+#         for key in data_dict:
+#             out_string += key + "= "
+#             if key in data_dict:
+#                 out_string += data_dict[key] + " "
+#             out_string += "/"
+#         print(out_string)
+
+
+# def receive_new_frame_with_data(data_dict):
+#     order_list = ["frameNumber", "markerSetCount", "unlabeledMarkersCount", #type: ignore  # noqa F841
+#                   "rigidBodyCount", "skeletonCount", "labeledMarkerCount",
+#                   "timecode", "timecodeSub", "timestamp", "isRecording",
+#                   "trackedModelsChanged", "offset", "mocap_data"]
+#     dump_args = True
+#     if dump_args is True:
+#         out_string = "    "
+#         for key in data_dict:
+#             out_string += key + "= "
+#             if key in data_dict:
+#                 out_string += str(data_dict[key]) + " "
+#             out_string += "/"
+#         print(out_string)
+
+
+# # This is a callback function that gets connected to the NatNet client.
+# # It is called once per rigid body per frame.
+# def receive_rigid_body_frame(new_id, position, rotation):
+#     pass
+#     print("Received frame for rigid body", new_id)
+#     print("Received frame for rigid body", new_id," ",position," ",rotation)
+
+
+
+
 def receive_new_pos(rigid_body_list):
     if len(rigid_body_list) != 2:
         return
@@ -75,7 +118,7 @@ def receive_new_pos(rigid_body_list):
     if start.id_num > end.id_num:
         start, end = end, start
 
-    #broadcast_rigid_body(rigid_body_list)
+    # broadcast_rigid_body(rigid_body_list)
 
     pt_on_screen, pt_on_dome, rigidbody_dist = idl.process_tracked_poses(start, end)
     if (pt_on_screen is None) or (pt_on_dome is None) or (rigidbody_dist is None):
@@ -123,13 +166,14 @@ def send_2_holophonix(x, y, z, reverb):
         holophonix_client.send_message("/track/1/gain", 12)
         
 def send_2_holophonix_new(reverb):
-    global current_mode
-    if current_mode == MODE_INTERACTION:
-        reverb_mapped = idl.map_range(reverb, 0, 1, 0, 15)
-        holophonix_client.send_message("/reverb/2/tr0", reverb_mapped)
+    # global current_mode
+    # if current_mode == MODE_INTERACTION:
+    reverb_mapped = idl.map_range(reverb, 0, 1, 0, 20)
+    # gain_mapped = idl.map_range(reverb, 0, 1, 2, 15)
+    holophonix_client.send_message("/reverb/2/tr0", reverb_mapped)
 
     # below two lines can be removed if the default setting in holophonix is set properly 
-    holophonix_client.send_message("/track/1/xyz", (0.1, 0.1, 0.1))  # location of sound
+    holophonix_client.send_message("/track/1/xyz", (0.6, 0.1, 0.1))  # location of sound
     holophonix_client.send_message("/track/1/gain", 6) # volume of sound
 
 def send_2_pygame(w, h, room_size):
@@ -198,9 +242,14 @@ def main():
         receive_thread.start()
     else:
         streaming_client = NatNetClient()
+        streaming_client.set_use_multicast(False)
         streaming_client.pos_listener = receive_new_pos
+        # Calls RB handler on emulator for data transmission.
+        # streaming_client.new_frame_listener = receive_new_frame
+        # streaming_client.new_frame_with_data_listener = receive_new_frame_with_data  # type ignore # noqa E501
+        # streaming_client.rigid_body_listener = receive_rigid_body_frame
         streaming_client.set_print_level(10)
-        streaming_client.run()
+        streaming_client.run("d")
 
     # Pygame init
     pygame.init()
