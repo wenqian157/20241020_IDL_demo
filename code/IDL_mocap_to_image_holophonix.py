@@ -26,7 +26,7 @@ from pythonosc import udp_client
 USE_MOCK_POS_DATA = False
 USE_MOCK_IMAGE = False
 COMFYUI_OUTPUT_FOLDER = "C:\\Demos\\Wen\\ComfyUI_windows_portable\\ComfyUI\\output"
-SET_FULLSCREEN = True
+SET_FULLSCREEN = False
 
 # ----------------------
 # Modes
@@ -118,7 +118,7 @@ def receive_new_pos(rigid_body_list):
     if start.id_num > end.id_num:
         start, end = end, start
 
-    # broadcast_rigid_body(rigid_body_list)
+    #broadcast_rigid_body([start])
 
     pt_on_screen, pt_on_dome, rigidbody_dist = idl.process_tracked_poses(start, end)
     if (pt_on_screen is None) or (pt_on_dome is None) or (rigidbody_dist is None):

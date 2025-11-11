@@ -94,20 +94,26 @@ def ray_dome_intersection(
     else:
         return None  # Intersection is in the opposite hemisphere
 
+def idl_remap(x, y, z):
+    return x, z, -y
 
 def process_tracked_poses(rigid_body_0, rigid_body_1):
+    # remap because of the change of coordinating system in IDL
+    new_pos0 = idl_remap(*rigid_body_0.pos)
+    new_pos1 = idl_remap(*rigid_body_1.pos)
+
     # create ray from trakced 2 poses
     ray_origin = np.array(
-        [rigid_body_0.pos[0], rigid_body_0.pos[1], rigid_body_0.pos[2]]
+        [new_pos0[0], new_pos0[1], new_pos0[2]]
     )
-    ray_end = np.array([rigid_body_1.pos[0], rigid_body_1.pos[1], rigid_body_1.pos[2]])
+    ray_end = np.array([new_pos1[0], new_pos1[1], new_pos1[2]])
     ray_direction = ray_origin - ray_end
     distance = np.linalg.norm(ray_end - ray_origin)
 
     # intersect with screen
     # fixed plane
-    plane_point = np.array([0, 0, 2.7])
-    plane_normal = np.array([0, 0, 1])
+    plane_point = np.array([0, 0, 2.7]) 
+    plane_normal = np.array([0, 0, 1]) 
 
     pt_screen = ray_plane_intersection(
         ray_origin, ray_direction, plane_point, plane_normal
